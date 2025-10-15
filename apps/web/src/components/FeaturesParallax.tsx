@@ -1,0 +1,116 @@
+import { useScroll, useTransform, motion } from "motion/react";
+import { useRef } from "react";
+import { Sparkles, Zap, Shield, Layers } from "lucide-react";
+// @ts-expect-error - JSX component
+import ElectricBorder from "./ElectricBorder";
+
+const features = [
+  {
+    icon: Sparkles,
+    title: "AI-Powered Design",
+    description:
+      "Leverage cutting-edge artificial intelligence to create stunning, pixel-perfect designs that captivate your audience and drive engagement.",
+    gradient: "from-purple-500 to-pink-600",
+    bgGradient: "from-purple-500/10 to-pink-600/10",
+  },
+  {
+    icon: Zap,
+    title: "Lightning Fast Performance",
+    description:
+      "Built on modern frameworks with optimized rendering for instant page loads and seamless interactions across all devices.",
+    gradient: "from-yellow-400 to-orange-500",
+    bgGradient: "from-yellow-400/10 to-orange-500/10",
+  },
+  {
+    icon: Shield,
+    title: "Enterprise Security",
+    description:
+      "Bank-grade encryption and security protocols ensure your data remains protected with industry-leading compliance standards.",
+    gradient: "from-emerald-400 to-teal-500",
+    bgGradient: "from-emerald-400/10 to-teal-500/10",
+  },
+  {
+    icon: Layers,
+    title: "Scalable Architecture",
+    description:
+      "Infrastructure that grows with your business, handling millions of requests with zero downtime and maximum reliability.",
+    gradient: "from-blue-400 to-cyan-500",
+    bgGradient: "from-blue-400/10 to-cyan-500/10",
+  },
+];
+
+function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const Icon = feature.icon;
+
+  const { scrollYProgress } = useScroll({ target: cardRef, offset: ["start end", "start start"] });
+
+  // Parallax transforms
+  const scale = useTransform(scrollYProgress, [0, 1], [0.85, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [120, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 0.6, 1]);
+
+  return (
+    <motion.div ref={cardRef} style={{ scale, y, opacity }} className="sticky top-[20vh] mb-8">
+      <ElectricBorder className="rounded-[2.5rem]" color="#3B82F6" speed={1.2} chaos={0.9} thickness={2}>
+        <div className={`relative rounded-[2.5rem] bg-black/80 border border-white/10 p-8 md:p-12 overflow-hidden`} style={{ zIndex: index + 1 }}>
+        {/* Subtle gradient layer behind content */}
+        <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgGradient} opacity-30`} />
+        {/* Decorative orb */}
+        <div className={`absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br ${feature.gradient} opacity-30 blur-3xl rounded-full`} />
+
+        <div className="relative z-10">
+          <div className="flex items-start gap-6 md:gap-8">
+            <div className={`flex-shrink-0 p-4 md:p-5 rounded-2xl bg-gradient-to-br ${feature.gradient} shadow-lg`}>
+              <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 md:mb-6 tracking-tight">{feature.title}</h3>
+              <p className="text-neutral-300 text-lg md:text-2xl leading-relaxed">{feature.description}</p>
+            </div>
+          </div>
+        </div>
+        </div>
+      </ElectricBorder>
+    </motion.div>
+  );
+}
+
+export default function FeaturesParallax() {
+  const containerRef = useRef<HTMLElement>(null);
+
+  return (
+    <section ref={containerRef} className="relative w-full bg-black">
+      <div className="relative z-10 pt-32 pb-20 px-6 text-center max-w-4xl mx-auto">
+        <motion.h2
+          className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          Platform Features
+        </motion.h2>
+        <motion.p
+          className="text-neutral-400 text-xl md:text-2xl leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          Everything you need to build exceptional digital experiences
+        </motion.p>
+      </div>
+
+      <div className="relative w-full max-w-6xl mx-auto px-6 pb-32">
+        {features.map((feature, index) => (
+          <FeatureCard key={index} feature={feature} index={index} />
+        ))}
+      </div>
+
+      <div className="h-[50vh]" />
+    </section>
+  );
+}
+
+
