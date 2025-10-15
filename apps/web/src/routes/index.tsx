@@ -2,6 +2,7 @@ import { BackgroundPaths } from "@/components/ui/background-paths";
 import { SplashCursor } from "@/components/ui/splash-cursor";
 import { AnimatedFooter } from "@/components/ui/animated-footer";
 import Navbar from "@/components/Navbar";
+import Features from "@/components/Features";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -14,6 +15,7 @@ function HomeComponent() {
 			<SplashCursor />
 			<Navbar />
 			<BackgroundPaths title="Welcome to Redcircle" />
+			<Features />
 			<AnimatedFooter />
 		</div>
 	);
