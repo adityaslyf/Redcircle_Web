@@ -1,65 +1,65 @@
-import BubbleMenu from "../BubbleMenu";
+import { StaggeredMenu } from "../StaggeredMenu";
 
 const items = [
 	{
-		label: "home",
-		href: "/",
-		ariaLabel: "Home",
-		rotation: -8,
-		hoverStyles: { bgColor: "#3b82f6", textColor: "#ffffff" },
+		label: "Home",
+		link: "/",
+		ariaLabel: "Go to home page",
 	},
 	{
-		label: "features",
-		href: "#features",
-		ariaLabel: "Features",
-		rotation: 8,
-		hoverStyles: { bgColor: "#10b981", textColor: "#ffffff" },
+		label: "Features",
+		link: "#features",
+		ariaLabel: "View features",
 	},
 	{
-		label: "about",
-		href: "#about",
-		ariaLabel: "About",
-		rotation: 8,
-		hoverStyles: { bgColor: "#f59e0b", textColor: "#ffffff" },
+		label: "About",
+		link: "#about",
+		ariaLabel: "Learn about us",
 	},
 	{
-		label: "pricing",
-		href: "#pricing",
-		ariaLabel: "Pricing",
-		rotation: -8,
-		hoverStyles: { bgColor: "#ef4444", textColor: "#ffffff" },
+		label: "Pricing",
+		link: "#pricing",
+		ariaLabel: "View pricing",
 	},
 	{
-		label: "contact",
-		href: "#contact",
-		ariaLabel: "Contact",
-		rotation: 8,
-		hoverStyles: { bgColor: "#8b5cf6", textColor: "#ffffff" },
+		label: "Contact",
+		link: "#contact",
+		ariaLabel: "Contact us",
 	},
+];
+
+const socialItems = [
+	{ label: "Twitter", link: "https://twitter.com/adityaslyf" },
+	{ label: "GitHub", link: "https://github.com/adityaslyf" },
+	{ label: "LinkedIn", link: "https://www.linkedin.com/in/aditya-varshney-089b33244/" },
 ];
 
 export default function Navbar() {
 	return (
-		<BubbleMenu
-			logo={
+		<StaggeredMenu
+			position="right"
+			colors={["#0a0a0a", "#1a1a1a"]}
+			items={items}
+			socialItems={socialItems}
+			displaySocials={true}
+			displayItemNumbering={true}
+			logoComponent={
 				<span
 					style={{
 						fontWeight: 700,
-						fontSize: "1.25rem",
-						letterSpacing: "-0.02em",
+						fontSize: "1.5rem",
+						letterSpacing: "-0.03em",
+						color: "#ffffff",
 					}}
 				>
 					Redcircle
 				</span>
 			}
-			items={items}
-			menuAriaLabel="Toggle navigation"
-			menuBg="#ffffff"
-			menuContentColor="#111111"
-			useFixedPosition={true}
-			animationEase="back.out(1.5)"
-			animationDuration={0.5}
-			staggerDelay={0.12}
+			menuButtonColor="#ffffff"
+			openMenuButtonColor="#ffffff"
+			accentColor="#3b82f6"
+			changeMenuColorOnOpen={false}
+			isFixed={true}
 		/>
 	);
 }
