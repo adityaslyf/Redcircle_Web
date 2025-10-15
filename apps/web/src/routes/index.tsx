@@ -1,3 +1,4 @@
+import { BackgroundPaths } from "@/components/ui/background-paths";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -5,9 +6,5 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-	return (
-<div>
-	<h1>Home</h1>
-</div>
-	);
+	return <BackgroundPaths title="Welcome to Redcircle" />;
 }
