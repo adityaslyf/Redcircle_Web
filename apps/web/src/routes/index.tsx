@@ -1,4 +1,5 @@
 import { BackgroundPaths } from "@/components/ui/background-paths";
+import { SplashCursor } from "@/components/ui/splash-cursor";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -6,5 +7,10 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-	return <BackgroundPaths title="Welcome to Redcircle" />;
+	return (
+		<>
+			<SplashCursor />
+			<BackgroundPaths title="Welcome to Redcircle" />
+		</>
+	);
 }
