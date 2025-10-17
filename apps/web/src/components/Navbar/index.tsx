@@ -26,6 +26,11 @@ const items = [
 		link: "#contact",
 		ariaLabel: "Contact us",
 	},
+	{
+		label: "Sign In",
+		link: "/signin",
+		ariaLabel: "Sign in to your account",
+	},
 ];
 
 const socialItems = [
@@ -36,31 +41,33 @@ const socialItems = [
 
 export default function Navbar() {
 	return (
-		<StaggeredMenu
-			position="right"
-			colors={["#0a0a0a", "#1a1a1a"]}
-			items={items}
-			socialItems={socialItems}
-			displaySocials={true}
-			displayItemNumbering={true}
-			logoComponent={
-				<span
-					style={{
-						fontWeight: 700,
-						fontSize: "1.5rem",
-						letterSpacing: "-0.03em",
-						color: "#ffffff",
-					}}
-					className="font-satoshi"
-				>
-					Redcircle
-				</span>
-			}
-			menuButtonColor="#ffffff"
-			openMenuButtonColor="#ffffff"
-			accentColor="#3b82f6"
-			changeMenuColorOnOpen={false}
-			isFixed={true}
-		/>
+		<>
+			<StaggeredMenu
+				position="right"
+				colors={["#0a0a0a", "#1a1a1a"]}
+				items={items}
+				socialItems={socialItems}
+				displaySocials={true}
+				displayItemNumbering={true}
+				logoComponent={
+					<span
+						style={{
+							fontWeight: 700,
+							fontSize: "1.5rem",
+							letterSpacing: "-0.03em",
+							color: "#ffffff",
+						}}
+						className="font-1797 uppercase"
+					>
+						Redcircle
+					</span>
+				}
+				menuButtonColor="#ffffff"
+				openMenuButtonColor="#ffffff"
+				accentColor="#3b82f6"
+				changeMenuColorOnOpen={false}
+				isFixed={true}
+			/>
+		</>
 	);
 }

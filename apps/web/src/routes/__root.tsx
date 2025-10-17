@@ -1,5 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/Navbar";
 import {
 	HeadContent,
 	Outlet,
@@ -42,6 +43,7 @@ function RootComponent() {
 				disableTransitionOnChange
 				storageKey="vite-ui-theme"
 			>
+				<Navbar />
 				<Outlet />
 				<Toaster richColors />
 			</ThemeProvider>
