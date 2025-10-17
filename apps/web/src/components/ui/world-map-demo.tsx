@@ -7,9 +7,9 @@ export function WorldMapDemo() {
     <div className="py-24 md:py-40 dark:bg-black bg-white w-full">
       <div className="max-w-7xl mx-auto text-center px-6">
         <p className="font-bold text-2xl md:text-5xl dark:text-white text-black">
-          Remote{" "}
+          Global{" "}
           <span className="text-neutral-400">
-            {"Connectivity".split("").map((ch, idx) => (
+            {"Community".split("").map((ch, idx) => (
               <motion.span
                 key={idx}
                 className="inline-block"
@@ -24,7 +24,7 @@ export function WorldMapDemo() {
           </span>
         </p>
         <p className="text-sm md:text-lg text-neutral-500 max-w-2xl mx-auto py-4">
-          Break free from traditional boundaries. Work from anywhere, at the comfort of your own studio apartment. Perfect for Nomads and Travellers.
+          Join traders worldwide on Solana's lightning-fast blockchain. RedCircle connects content creators and investors across continents, building a decentralized social finance ecosystem.
         </p>
       </div>
       <div className="max-w-7xl mx-auto px-6">

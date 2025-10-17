@@ -85,10 +85,10 @@ export function AnimatedFooter() {
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">
             <CircleIcon className="w-10 h-10 text-red-500 fill-red-500" />
-            <span className="text-3xl font-bold tracking-tight">Redcircle</span>
+            <span className="text-3xl font-bold tracking-tight">RedCircle</span>
           </div>
           <p className="text-neutral-400 max-w-xl">
-            Transforming ideas into exceptional digital experiences.
+            Tokenizing viral Reddit content on Solana blockchain. Turn social media engagement into real financial value.
           </p>
         </div>
 
@@ -103,13 +103,13 @@ export function AnimatedFooter() {
               {Array.from({ length: 2 }).map((_, i) => (
                 <div key={i} className="flex gap-12 text-neutral-500">
                   {[
-                    "Design Systems",
-                    "GSAP Motion",
-                    "Accessibility",
-                    "Performance",
-                    "TypeScript",
-                    "TailwindCSS",
-                    "WebGL Ready",
+                    "Web3 Social",
+                    "Solana Blockchain",
+                    "Reddit Integration",
+                    "Token Trading",
+                    "Decentralized Finance",
+                    "Content Monetization",
+                    "Community Rewards",
                   ].map((label) => (
                     <span key={`${i}-${label}`} className="tracking-wide text-sm">
                       {label}
@@ -123,19 +123,19 @@ export function AnimatedFooter() {
 
         {/* Links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <MotionCol title="Company" links={[
-            { label: "About", href: "/about" },
-            { label: "Careers", href: "/careers" },
-            { label: "Blog", href: "/blog" },
+          <MotionCol title="Platform" links={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Browse Posts", href: "/posts" },
+            { label: "Marketplace", href: "/market" },
           ]} delay={0.05} />
-          <MotionCol title="Product" links={[
-            { label: "Features", href: "#features" },
-            { label: "Pricing", href: "#pricing" },
-            { label: "Changelog", href: "/changelog" },
+          <MotionCol title="Features" links={[
+            { label: "Tokenize Posts", href: "/tokenize" },
+            { label: "Trade Tokens", href: "/trade" },
+            { label: "Earn Rewards", href: "/rewards" },
           ]} delay={0.1} />
           <MotionCol title="Resources" links={[
-            { label: "Docs", href: "/docs" },
-            { label: "Help Center", href: "/help" },
+            { label: "Documentation", href: "/docs" },
+            { label: "Whitepaper", href: "/whitepaper" },
             { label: "API", href: "/api" },
           ]} delay={0.15} />
           <motion.div
@@ -155,10 +155,10 @@ export function AnimatedFooter() {
 
         {/* bottom row */}
         <div className="mt-10 flex flex-col md:flex-row items-center justify-between gap-6 text-neutral-500 text-sm">
-          <span>© {new Date().getFullYear()} Redcircle. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} RedCircle. All rights reserved.</span>
           <div className="flex items-center gap-6">
-            <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
-            <a href="/terms" className="hover:text-white transition-colors">Terms</a>
+            <a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="/terms" className="hover:text-white transition-colors">Terms of Service</a>
           </div>
         </div>
       </div>

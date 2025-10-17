@@ -20,7 +20,7 @@ function FloatingPaths({ position }: { position: number }) {
 	return (
 		<div className="absolute inset-0 pointer-events-none">
 			<svg
-				className="w-full h-full text-slate-950 dark:text-white"
+				className="w-full h-full text-slate-950 dark:text-white bg-black"
 				viewBox="0 0 696 316"
 				fill="none"
 			>
@@ -52,8 +52,10 @@ function FloatingPaths({ position }: { position: number }) {
 
 export function BackgroundPaths({
 	title = "Background Paths",
+	subtitle,
 }: {
 	title?: string;
+	subtitle?: string;
 }) {
 	const words = title.split(" ");
 
@@ -101,7 +103,21 @@ export function BackgroundPaths({
 						))}
 					</h1>
 
-					<div
+					{subtitle && (
+						<motion.p
+							initial={{ opacity: 0, y: 20 }}
+							animate={{ opacity: 1, y: 0 }}
+							transition={{ delay: 0.5, duration: 0.8 }}
+							className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 mb-12 max-w-3xl mx-auto leading-relaxed"
+						>
+							{subtitle}
+						</motion.p>
+					)}
+
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.8, duration: 0.8 }}
 						className="inline-block group relative bg-gradient-to-b from-black/10 to-white/10 
                         dark:from-white/10 dark:to-black/10 p-px rounded-2xl backdrop-blur-lg 
                         overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
@@ -115,7 +131,7 @@ export function BackgroundPaths({
                             hover:shadow-md dark:hover:shadow-neutral-800/50"
 						>
 							<span className="opacity-90 group-hover:opacity-100 transition-opacity">
-								Discover Excellence
+								Start Trading Now
 							</span>
 							<span
 								className="ml-3 opacity-70 group-hover:opacity-100 group-hover:translate-x-1.5 
@@ -124,7 +140,7 @@ export function BackgroundPaths({
 								→
 							</span>
 						</Button>
-					</div>
+					</motion.div>
 				</motion.div>
 			</div>
 		</div>

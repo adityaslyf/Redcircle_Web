@@ -1,39 +1,39 @@
 import { useScroll, useTransform, motion } from "motion/react";
 import { useRef } from "react";
-import { Sparkles, Zap, Shield, Layers } from "lucide-react";
+import { Link2, Coins, TrendingUp, Trophy } from "lucide-react";
 
 const features = [
   {
-    icon: Sparkles,
-    title: "AI-Powered Design",
+    icon: Link2,
+    title: "Reddit Integration",
     description:
-      "Leverage cutting-edge artificial intelligence to create stunning, pixel-perfect designs that captivate your audience and drive engagement.",
+      "Seamlessly connect your Reddit account with OAuth authentication. Browse, analyze, and submit viral posts directly from your favorite subreddits with real-time engagement metrics.",
+    gradient: "from-orange-500 to-red-600",
+    bgGradient: "from-orange-500/10 to-red-600/10",
+  },
+  {
+    icon: Coins,
+    title: "Post Tokenization",
+    description:
+      "Transform viral Reddit posts into tradeable digital assets on Solana blockchain. Each post becomes a unique token with value determined by community engagement and trading activity.",
     gradient: "from-purple-500 to-pink-600",
     bgGradient: "from-purple-500/10 to-pink-600/10",
   },
   {
-    icon: Zap,
-    title: "Lightning Fast Performance",
+    icon: TrendingUp,
+    title: "Social Trading",
     description:
-      "Built on modern frameworks with optimized rendering for instant page loads and seamless interactions across all devices.",
-    gradient: "from-yellow-400 to-orange-500",
-    bgGradient: "from-yellow-400/10 to-orange-500/10",
-  },
-  {
-    icon: Shield,
-    title: "Enterprise Security",
-    description:
-      "Bank-grade encryption and security protocols ensure your data remains protected with industry-leading compliance standards.",
-    gradient: "from-emerald-400 to-teal-500",
-    bgGradient: "from-emerald-400/10 to-teal-500/10",
-  },
-  {
-    icon: Layers,
-    title: "Scalable Architecture",
-    description:
-      "Infrastructure that grows with your business, handling millions of requests with zero downtime and maximum reliability.",
+      "Buy, sell, and trade post tokens like stocks in a decentralized marketplace. Track performance metrics, analyze trends, and build your portfolio of viral content investments.",
     gradient: "from-blue-400 to-cyan-500",
     bgGradient: "from-blue-400/10 to-cyan-500/10",
+  },
+  {
+    icon: Trophy,
+    title: "Rewards System",
+    description:
+      "Earn points and cryptocurrency rewards for submitting popular posts. The more engagement your submissions generate, the more you earn. Top contributors get exclusive perks and bonuses.",
+    gradient: "from-yellow-400 to-orange-500",
+    bgGradient: "from-yellow-400/10 to-orange-500/10",
   },
 ];
 
@@ -92,7 +92,7 @@ export default function FeaturesParallax() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          Platform Features
+          Powerful Features
         </motion.h2>
         <motion.p
           className="text-neutral-400 text-xl md:text-2xl leading-relaxed"
@@ -101,7 +101,7 @@ export default function FeaturesParallax() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          Everything you need to build exceptional digital experiences
+          Everything you need to tokenize, trade, and profit from viral social content on Web3
         </motion.p>
       </div>
 
