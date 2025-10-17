@@ -12,7 +12,7 @@ export function AnimatedFooter() {
   }, []);
 
   return (
-    <footer className="relative w-full bg-black text-white pt-28 pb-16 px-6 overflow-hidden border border-t-3 rounded-t-4xl">
+    <footer className="relative w-full bg-black text-white pt-28 pb-16 px-6 overflow-hidden border-t-2 border-white/40 rounded-t-[3rem]">
       {/* Animated top design band */}
       <div ref={bandRef} className="absolute top-0 left-0 right-0 h-24 overflow-hidden">
         {/* flowing grid highlight */}

@@ -1,4 +1,5 @@
 import { StaggeredMenu } from "../StaggeredMenu";
+import { useEffect, useState } from "react";
 
 const items = [
 	{
@@ -35,32 +36,59 @@ const socialItems = [
 ];
 
 export default function Navbar() {
+	const [isVisible, setIsVisible] = useState(true);
+
+	useEffect(() => {
+		const handleScroll = () => {
+			const heroHeight = window.innerHeight; // Hero section is min-h-screen
+			const scrollPosition = window.scrollY;
+			
+			// Hide navbar after scrolling past hero section
+			setIsVisible(scrollPosition < heroHeight);
+		};
+
+		// Check initial scroll position
+		handleScroll();
+
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+
 	return (
-		<StaggeredMenu
-			position="right"
-			colors={["#0a0a0a", "#1a1a1a"]}
-			items={items}
-			socialItems={socialItems}
-			displaySocials={true}
-			displayItemNumbering={true}
-			logoComponent={
-				<span
-					style={{
-						fontWeight: 700,
-						fontSize: "1.5rem",
-						letterSpacing: "-0.03em",
-						color: "#ffffff",
-					}}
-					className="font-1797 uppercase"
-				>
-					Redcircle
-				</span>
-			}
-			menuButtonColor="#ffffff"
-			openMenuButtonColor="#ffffff"
-			accentColor="#3b82f6"
-			changeMenuColorOnOpen={false}
-			isFixed={true}
-		/>
+		<div
+			className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+			style={{
+				opacity: isVisible ? 1 : 0,
+				pointerEvents: isVisible ? "auto" : "none",
+				transform: isVisible ? "translateY(0)" : "translateY(-20px)",
+			}}
+		>
+			<StaggeredMenu
+				position="right"
+				colors={["#0a0a0a", "#1a1a1a"]}
+				items={items}
+				socialItems={socialItems}
+				displaySocials={true}
+				displayItemNumbering={true}
+				logoComponent={
+					<span
+						style={{
+							fontWeight: 700,
+							fontSize: "1.5rem",
+							letterSpacing: "-0.03em",
+							color: "#ffffff",
+						}}
+						className="font-1797 uppercase"
+					>
+						Redcircle
+					</span>
+				}
+				menuButtonColor="#ffffff"
+				openMenuButtonColor="#ffffff"
+				accentColor="#3b82f6"
+				changeMenuColorOnOpen={false}
+				isFixed={false}
+			/>
+		</div>
 	);
 }

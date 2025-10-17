@@ -55,7 +55,7 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index:
       className="sticky top-[12vh] sm:top-[15vh] md:top-[18vh] mb-8 sm:mb-10 md:mb-12"
     >
       <div
-        className="relative rounded-2xl sm:rounded-3xl bg-black border border-white/10 ring-1 ring-white/5 p-6 sm:p-8 md:p-12 lg:p-16 min-h-[22rem] sm:min-h-[24rem] md:min-h-[28rem] lg:min-h-[32rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-32px_rgba(0,0,0,0.8)]"
+        className="relative rounded-2xl sm:rounded-3xl bg-black border border-white/40 ring-1 ring-white/20 p-6 sm:p-8 md:p-12 lg:p-16 min-h-[22rem] sm:min-h-[24rem] md:min-h-[28rem] lg:min-h-[32rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-32px_rgba(0,0,0,0.8)]"
         style={{ zIndex: index + 1 }}
       >
         {/* Subtle grid & gradient wash */}
