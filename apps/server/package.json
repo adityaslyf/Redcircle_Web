@@ -10,18 +10,21 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "express": "^5.1.0",
+    "@Redcircle/db": "workspace:*",
     "cors": "^2.8.5",
     "dotenv": "catalog:",
-    "zod": "catalog:",
-    "@Redcircle/db": "workspace:*"
+    "drizzle-orm": "^0.44.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "typescript": "catalog:",
-    "@types/express": "^5.0.1",
     "@types/cors": "^2.8.17",
-    "tsx": "^4.19.2",
+    "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "catalog:",
-    "tsdown": "catalog:"
+    "tsdown": "catalog:",
+    "tsx": "^4.19.2",
+    "typescript": "catalog:"
   }
 }

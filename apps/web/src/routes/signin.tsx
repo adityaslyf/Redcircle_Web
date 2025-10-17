@@ -1,11 +1,71 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SignInPage } from "../components/ui/sign-in";
+import { useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { getApiUrl } from "../lib/auth";
 
 export const Route = createFileRoute("/signin")({
   component: SignIn,
 });
 
 function SignIn() {
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate({ to: "/" });
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Handle OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const userStr = params.get("user");
+    const error = params.get("error");
+
+    if (error) {
+      console.error("❌ Authentication error:", error);
+      
+      // Show user-friendly error messages
+      const errorMessages: { [key: string]: string } = {
+        auth_failed: "Reddit authentication failed. This usually means:\n\n• The users table doesn't exist (run: pnpm db:push)\n• Database connection failed (check DATABASE_URL)\n\nCheck the backend terminal for detailed error logs.",
+        no_user: "Reddit authentication succeeded but no user was returned. Check backend logs.",
+        session_failed: "Failed to create session. Please try again.",
+        server_error: "Server error occurred. Please try again.",
+      };
+      
+      const message = errorMessages[error] || `Unknown error: ${error}`;
+      alert(`Authentication Error\n\n${message}\n\n⚠️ IMPORTANT: Check your backend terminal for detailed error logs!`);
+      
+      // Clean up URL
+      window.history.replaceState({}, document.title, "/signin");
+      return;
+    }
+
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(decodeURIComponent(userStr));
+        
+        // Use auth context to log in
+        login(token, user);
+        
+        console.log("✅ Successfully signed in:", user);
+        
+        // Clean up URL
+        window.history.replaceState({}, document.title, "/signin");
+        
+        // Redirect to home page
+        navigate({ to: "/" });
+      } catch (err) {
+        console.error("❌ Error parsing user data:", err);
+        alert("Failed to complete sign in. Please try again.");
+      }
+    }
+  }, [login, navigate]);
+
   const handleSignIn = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -13,29 +73,36 @@ function SignIn() {
     const password = formData.get("password");
     const rememberMe = formData.get("rememberMe");
 
-    console.log("Sign in:", { email, password, rememberMe });
-    // Add your authentication logic here
+    console.log("Email/Password sign in:", { email, password, rememberMe });
+    
+    // TODO: Implement email/password authentication
+    alert("Email/password authentication is not yet implemented. Please use Reddit sign-in.");
   };
 
   const handleRedditSignIn = () => {
-    console.log("Reddit sign in clicked");
-    // Add your Reddit OAuth logic here
-    // Reddit OAuth endpoint: https://www.reddit.com/api/v1/authorize
+    console.log("🔴 Reddit sign-in button clicked!");
+    
+    // Redirect to backend OAuth endpoint
+    const backendUrl = getApiUrl();
+    console.log("🔴 Backend URL:", backendUrl);
+    console.log("🔴 Redirecting to:", `${backendUrl}/auth/reddit`);
+    
+    window.location.href = `${backendUrl}/auth/reddit`;
   };
 
   const handleGoogleSignIn = () => {
-    console.log("Google sign in clicked");
-    // Add your Google OAuth logic here
+    // TODO: Implement Google OAuth
+    alert("Google sign-in is not yet implemented. Please use Reddit sign-in.");
   };
 
   const handleResetPassword = () => {
-    console.log("Reset password clicked");
-    // Add your password reset logic here
+    // TODO: Implement password reset
+    alert("Password reset is not yet implemented.");
   };
 
   const handleCreateAccount = () => {
-    console.log("Create account clicked");
-    // Add your account creation logic here
+    // TODO: Implement account creation
+    alert("Account creation is not yet implemented. You can sign in with Reddit to create an account automatically.");
   };
 
   return (

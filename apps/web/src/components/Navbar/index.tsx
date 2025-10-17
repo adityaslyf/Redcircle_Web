@@ -1,4 +1,6 @@
 import { StaggeredMenu } from "../StaggeredMenu";
+import { useAuth } from "../../contexts/AuthContext";
+import UserProfile from "../UserProfile";
 
 const items = [
 	{
@@ -40,6 +42,8 @@ const socialItems = [
 ];
 
 export default function Navbar() {
+	const { isAuthenticated } = useAuth();
+
 	return (
 		<>
 			<StaggeredMenu
@@ -50,17 +54,20 @@ export default function Navbar() {
 				displaySocials={true}
 				displayItemNumbering={true}
 				logoComponent={
-					<span
-						style={{
-							fontWeight: 700,
-							fontSize: "1.5rem",
-							letterSpacing: "-0.03em",
-							color: "#ffffff",
-						}}
-						className="font-1797 uppercase"
-					>
-						Redcircle
-					</span>
+					<div className="flex items-center justify-between w-full gap-4">
+						<span
+							style={{
+								fontWeight: 700,
+								fontSize: "1.5rem",
+								letterSpacing: "-0.03em",
+								color: "#ffffff",
+							}}
+							className="font-1797 uppercase"
+						>
+							Redcircle
+						</span>
+						{isAuthenticated && <UserProfile />}
+					</div>
 				}
 				menuButtonColor="#ffffff"
 				openMenuButtonColor="#ffffff"
