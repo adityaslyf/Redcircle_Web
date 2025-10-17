@@ -51,25 +51,28 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index:
   const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 0.6, 1]);
 
   return (
-    <motion.div ref={cardRef} style={{ scale, y, opacity }} className="sticky top-[20vh] mb-8">
-      <ElectricBorder className="rounded-[2.5rem]" color="#3B82F6" speed={1.2} chaos={0.9} thickness={2}>
-        <div className={`relative rounded-[2.5rem] bg-black/80 border border-white/10 p-8 md:p-12 overflow-hidden`} style={{ zIndex: index + 1 }}>
-        {/* Subtle gradient layer behind content */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${feature.bgGradient} opacity-30`} />
-        {/* Decorative orb */}
-        <div className={`absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br ${feature.gradient} opacity-30 blur-3xl rounded-full`} />
+    <motion.div ref={cardRef} style={{ scale, y, opacity }} className="sticky top-[18vh] mb-10">
+      <ElectricBorder className="rounded-3xl" color="#3B82F6" speed={1} chaos={0.6} thickness={1.5}>
+        <div
+          className="relative rounded-3xl bg-black/90 border border-white/8 ring-1 ring-white/5 p-10 md:p-16 min-h-[24rem] md:min-h-[30rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_60px_-24px_rgba(0,0,0,0.7)]"
+          style={{ zIndex: index + 1 }}
+        >
+          {/* Subtle monochrome gradient wash */}
+          <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/0 via-neutral-900/40 to-neutral-950/0" />
+          {/* Accent orb */}
+          <div className={`pointer-events-none absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br ${feature.gradient} opacity-20 blur-3xl rounded-full`} />
 
-        <div className="relative z-10">
-          <div className="flex items-start gap-6 md:gap-8">
-            <div className={`flex-shrink-0 p-4 md:p-5 rounded-2xl bg-gradient-to-br ${feature.gradient} shadow-lg`}>
-              <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-3xl md:text-5xl font-bold text-white mb-4 md:mb-6 tracking-tight">{feature.title}</h3>
-              <p className="text-neutral-300 text-lg md:text-2xl leading-relaxed">{feature.description}</p>
+          <div className="relative z-10">
+            <div className="flex items-start gap-7 md:gap-9">
+              <div className="flex-shrink-0 p-4 md:p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg">
+                <Icon className="w-9 h-9 md:w-11 md:h-11 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-4xl md:text-6xl font-bold text-white mb-5 md:mb-7 tracking-tight">{feature.title}</h3>
+                <p className="text-neutral-300 text-lg md:text-xl leading-relaxed max-w-3xl">{feature.description}</p>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </ElectricBorder>
     </motion.div>
@@ -102,7 +105,7 @@ export default function FeaturesParallax() {
         </motion.p>
       </div>
 
-      <div className="relative w-full max-w-6xl mx-auto px-6 pb-32">
+      <div className="relative w-full max-w-7xl mx-auto px-6 pb-36">
         {features.map((feature, index) => (
           <FeatureCard key={index} feature={feature} index={index} />
         ))}
