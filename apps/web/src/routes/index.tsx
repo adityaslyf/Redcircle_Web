@@ -4,10 +4,12 @@ import { AnimatedFooter } from "@/components/ui/animated-footer";
 import Navbar from "@/components/Navbar";
 import FeaturesParallax from "@/components/FeaturesParallax";
 import { createFileRoute } from "@tanstack/react-router";
+import { WorldMapDemo } from "@/components/ui/world-map-demo";
 
 export const Route = createFileRoute("/")({
 	component: HomeComponent,
 });
+
 
 function HomeComponent() {
 	return (
@@ -15,6 +17,7 @@ function HomeComponent() {
 			<SplashCursor />
 			<Navbar />
 			<BackgroundPaths title="Welcome to Redcircle" />
+			<WorldMapDemo />
 			<FeaturesParallax />
 			<AnimatedFooter />
 		</div>
