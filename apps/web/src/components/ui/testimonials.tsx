@@ -89,7 +89,7 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-1797 uppercase"
+            className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight font-satoshi"
           >
             Loved by traders and creators
           </motion.h2>

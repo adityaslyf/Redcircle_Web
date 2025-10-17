@@ -6,7 +6,7 @@ export function WorldMapDemo() {
   return (
     <div className="py-24 md:py-40 dark:bg-black bg-white w-full">
       <div className="max-w-7xl mx-auto text-center px-6">
-        <p className="font-bold text-2xl md:text-5xl dark:text-white text-black font-1797 uppercase">
+        <p className="font-bold text-2xl md:text-5xl dark:text-white text-black font-satoshi">
           Global{" "}
           <span className="text-neutral-400">
             {"Community".split("").map((ch, idx) => (

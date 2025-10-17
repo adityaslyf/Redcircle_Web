@@ -74,7 +74,7 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index:
               <Icon className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 md:mb-6 lg:mb-7 tracking-tight leading-tight uppercase font-1797">
+              <h3 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 md:mb-6 lg:mb-7 tracking-tight leading-tight font-satoshi">
                 {feature.title}
               </h3>
               <p className="text-neutral-300 text-base sm:text-lg md:text-xl leading-relaxed max-w-3xl">
@@ -95,7 +95,7 @@ export default function FeaturesParallax() {
     <section ref={containerRef} className="relative w-full bg-black">
       <div className="relative z-10 pt-16 sm:pt-20 md:pt-28 lg:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 text-center max-w-4xl mx-auto">
         <motion.h2
-          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-5 md:mb-6 tracking-tight font-1797 uppercase"
+          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-5 md:mb-6 tracking-tight font-satoshi"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

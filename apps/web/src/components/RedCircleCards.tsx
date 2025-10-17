@@ -35,7 +35,7 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
           
           <div className="absolute [transform:translate3d(0,0,26px)]">
             <div className="px-7 pt-[100px] pb-0">
-              <span className="block text-xl font-black text-white uppercase font-1797">
+              <span className="block text-xl font-black text-white font-satoshi">
                 {title}
               </span>
               <span className="mt-5 block text-[15px] text-zinc-300">
@@ -142,7 +142,7 @@ export default function RedCircleCards() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 font-1797 uppercase">
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 font-satoshi">
             How It Works
           </h2>
           <p className="text-xl text-neutral-400 max-w-2xl mx-auto">
