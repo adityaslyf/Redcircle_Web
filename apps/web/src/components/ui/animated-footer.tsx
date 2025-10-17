@@ -12,13 +12,13 @@ export function AnimatedFooter() {
   }, []);
 
   return (
-    <footer className="relative w-full bg-black text-white pt-28 pb-16 px-6 overflow-hidden">
+    <footer className="relative w-full bg-black text-white pt-28 pb-16 px-6 overflow-hidden border border-t-3 rounded-t-4xl">
       {/* Animated top design band */}
       <div ref={bandRef} className="absolute top-0 left-0 right-0 h-24 overflow-hidden">
         {/* flowing grid highlight */}
         <motion.div
           aria-hidden
-          className="absolute inset-0 opacity-30"
+          className="absolute-0 opacity-30"
           style={{
             backgroundImage:
               "repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 24px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 24px)",
@@ -81,17 +81,6 @@ export function AnimatedFooter() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Brand */}
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <CircleIcon className="w-10 h-10 text-red-500 fill-red-500" />
-            <span className="text-3xl font-bold tracking-tight">RedCircle</span>
-          </div>
-          <p className="text-neutral-400 max-w-xl">
-            Tokenizing viral Reddit content on Solana blockchain. Turn social media engagement into real financial value.
-          </p>
-        </div>
-
         {/* Marquee highlights */}
         <div className="relative mb-10 overflow-hidden">
           <style>{`@keyframes rc-scroll-x { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>

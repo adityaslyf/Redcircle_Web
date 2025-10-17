@@ -77,10 +77,6 @@ export function Footer() {
 
 			<div className="grid w-full gap-8 xl:grid-cols-3 xl:gap-8">
 				<AnimatedContainer className="space-y-4">
-					<div className="flex items-center gap-2">
-						<CircleIcon className="size-8 text-red-500 fill-red-500" />
-						<span className="text-xl font-bold">Redcircle</span>
-					</div>
 					<p className="text-muted-foreground mt-8 text-sm md:mt-0">
 						© {new Date().getFullYear()} Redcircle. All rights reserved.
 					</p>

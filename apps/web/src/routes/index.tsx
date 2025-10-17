@@ -24,7 +24,6 @@ function HomeComponent() {
 			/>
 			
 
-
 			<WorldMapDemo />
 			<RedCircleCards />
 			<FeaturesParallax />
