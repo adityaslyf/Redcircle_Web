@@ -43,34 +43,43 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index:
 
   const { scrollYProgress } = useScroll({ target: cardRef, offset: ["start end", "start start"] });
 
-  // Parallax transforms
-  const scale = useTransform(scrollYProgress, [0, 1], [0.85, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [120, 0]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 0.6, 1]);
+  // Parallax transforms - optimized for mobile
+  const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [60, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 0.7, 1]);
 
   return (
-    <motion.div ref={cardRef} style={{ scale, y, opacity }} className="sticky top-[18vh] mb-12">
+    <motion.div 
+      ref={cardRef} 
+      style={{ scale, y, opacity }} 
+      className="sticky top-[12vh] sm:top-[15vh] md:top-[18vh] mb-8 sm:mb-10 md:mb-12"
+    >
       <div
-        className="relative rounded-3xl bg-black border border-white/10 ring-1 ring-white/5 p-10 md:p-16 min-h-[26rem] md:min-h-[32rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-32px_rgba(0,0,0,0.8)]"
+        className="relative rounded-2xl sm:rounded-3xl bg-black border border-white/10 ring-1 ring-white/5 p-6 sm:p-8 md:p-12 lg:p-16 min-h-[22rem] sm:min-h-[24rem] md:min-h-[28rem] lg:min-h-[32rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-32px_rgba(0,0,0,0.8)]"
         style={{ zIndex: index + 1 }}
       >
         {/* Subtle grid & gradient wash */}
         <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{
           backgroundImage:
-            "repeating-linear-gradient(0deg, rgba(255,255,255,0.8) 0 1px, transparent 1px 36px),repeating-linear-gradient(90deg, rgba(255,255,255,0.8) 0 1px, transparent 1px 36px)",
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.8) 0 1px, transparent 1px 24px),repeating-linear-gradient(90deg, rgba(255,255,255,0.8) 0 1px, transparent 1px 24px)",
+          backgroundSize: "100% 100%",
         }} />
         <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/0 via-neutral-900/40 to-neutral-950/0" />
-        {/* Accent orb */}
-        <div className={`pointer-events-none absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br ${feature.gradient} opacity-20 blur-3xl rounded-full`} />
+        {/* Accent orb - responsive sizing */}
+        <div className={`pointer-events-none absolute -top-16 sm:-top-20 md:-top-24 -right-16 sm:-right-20 md:-right-24 w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-gradient-to-br ${feature.gradient} opacity-20 blur-3xl rounded-full`} />
 
         <div className="relative z-10">
-          <div className="flex items-start gap-7 md:gap-9">
-            <div className="flex-shrink-0 p-4 md:p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg">
-              <Icon className="w-9 h-9 md:w-11 md:h-11 text-white" />
+          <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-5 md:gap-7 lg:gap-9">
+            <div className="flex-shrink-0 p-3 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg">
+              <Icon className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 lg:w-11 lg:h-11 text-white" />
             </div>
-            <div className="flex-1">
-              <h3 className="text-4xl md:text-6xl font-bold text-white mb-5 md:mb-7 tracking-tight">{feature.title}</h3>
-              <p className="text-neutral-300 text-lg md:text-xl leading-relaxed max-w-3xl">{feature.description}</p>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 md:mb-6 lg:mb-7 tracking-tight leading-tight">
+                {feature.title}
+              </h3>
+              <p className="text-neutral-300 text-base sm:text-lg md:text-xl leading-relaxed max-w-3xl">
+                {feature.description}
+              </p>
             </div>
           </div>
         </div>
@@ -84,9 +93,9 @@ export default function FeaturesParallax() {
 
   return (
     <section ref={containerRef} className="relative w-full bg-black">
-      <div className="relative z-10 pt-32 pb-20 px-6 text-center max-w-4xl mx-auto">
+      <div className="relative z-10 pt-16 sm:pt-20 md:pt-28 lg:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 text-center max-w-4xl mx-auto">
         <motion.h2
-          className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight"
+          className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-5 md:mb-6 tracking-tight"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -95,7 +104,7 @@ export default function FeaturesParallax() {
           Powerful Features
         </motion.h2>
         <motion.p
-          className="text-neutral-400 text-xl md:text-2xl leading-relaxed"
+          className="text-neutral-400 text-base sm:text-lg md:text-xl lg:text-2xl leading-relaxed px-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -105,13 +114,13 @@ export default function FeaturesParallax() {
         </motion.p>
       </div>
 
-      <div className="relative w-full max-w-7xl mx-auto px-6 pb-36">
+      <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28 md:pb-36">
         {features.map((feature, index) => (
           <FeatureCard key={index} feature={feature} index={index} />
         ))}
       </div>
 
-      <div className="h-[50vh]" />
+      <div className="h-[30vh] sm:h-[40vh] md:h-[50vh]" />
     </section>
   );
 }
