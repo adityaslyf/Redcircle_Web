@@ -1,8 +1,6 @@
 import { useScroll, useTransform, motion } from "motion/react";
 import { useRef } from "react";
 import { Sparkles, Zap, Shield, Layers } from "lucide-react";
-// @ts-expect-error - JSX component
-import ElectricBorder from "./ElectricBorder";
 
 const features = [
   {
@@ -51,30 +49,32 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index:
   const opacity = useTransform(scrollYProgress, [0, 0.2, 1], [0, 0.6, 1]);
 
   return (
-    <motion.div ref={cardRef} style={{ scale, y, opacity }} className="sticky top-[18vh] mb-10">
-      <ElectricBorder className="rounded-3xl" color="#3B82F6" speed={1} chaos={0.6} thickness={1.5}>
-        <div
-          className="relative rounded-3xl bg-black/90 border border-white/8 ring-1 ring-white/5 p-10 md:p-16 min-h-[24rem] md:min-h-[30rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_60px_-24px_rgba(0,0,0,0.7)]"
-          style={{ zIndex: index + 1 }}
-        >
-          {/* Subtle monochrome gradient wash */}
-          <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/0 via-neutral-900/40 to-neutral-950/0" />
-          {/* Accent orb */}
-          <div className={`pointer-events-none absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br ${feature.gradient} opacity-20 blur-3xl rounded-full`} />
+    <motion.div ref={cardRef} style={{ scale, y, opacity }} className="sticky top-[18vh] mb-12">
+      <div
+        className="relative rounded-3xl bg-neutral-950 border border-white/10 ring-1 ring-white/5 p-10 md:p-16 min-h-[26rem] md:min-h-[32rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-32px_rgba(0,0,0,0.8)]"
+        style={{ zIndex: index + 1 }}
+      >
+        {/* Subtle grid & gradient wash */}
+        <div className="absolute inset-0 opacity-[0.06] pointer-events-none" style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, rgba(255,255,255,0.8) 0 1px, transparent 1px 36px),repeating-linear-gradient(90deg, rgba(255,255,255,0.8) 0 1px, transparent 1px 36px)",
+        }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-neutral-900/0 via-neutral-900/40 to-neutral-950/0" />
+        {/* Accent orb */}
+        <div className={`pointer-events-none absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-br ${feature.gradient} opacity-20 blur-3xl rounded-full`} />
 
-          <div className="relative z-10">
-            <div className="flex items-start gap-7 md:gap-9">
-              <div className="flex-shrink-0 p-4 md:p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg">
-                <Icon className="w-9 h-9 md:w-11 md:h-11 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-4xl md:text-6xl font-bold text-white mb-5 md:mb-7 tracking-tight">{feature.title}</h3>
-                <p className="text-neutral-300 text-lg md:text-xl leading-relaxed max-w-3xl">{feature.description}</p>
-              </div>
+        <div className="relative z-10">
+          <div className="flex items-start gap-7 md:gap-9">
+            <div className="flex-shrink-0 p-4 md:p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-lg">
+              <Icon className="w-9 h-9 md:w-11 md:h-11 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-4xl md:text-6xl font-bold text-white mb-5 md:mb-7 tracking-tight">{feature.title}</h3>
+              <p className="text-neutral-300 text-lg md:text-xl leading-relaxed max-w-3xl">{feature.description}</p>
             </div>
           </div>
         </div>
-      </ElectricBorder>
+      </div>
     </motion.div>
   );
 }
