@@ -51,7 +51,7 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index:
   return (
     <motion.div ref={cardRef} style={{ scale, y, opacity }} className="sticky top-[18vh] mb-12">
       <div
-        className="relative rounded-3xl bg-neutral-950 border border-white/10 ring-1 ring-white/5 p-10 md:p-16 min-h-[26rem] md:min-h-[32rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-32px_rgba(0,0,0,0.8)]"
+        className="relative rounded-3xl bg-black border border-white/10 ring-1 ring-white/5 p-10 md:p-16 min-h-[26rem] md:min-h-[32rem] overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_30px_80px_-32px_rgba(0,0,0,0.8)]"
         style={{ zIndex: index + 1 }}
       >
         {/* Subtle grid & gradient wash */}

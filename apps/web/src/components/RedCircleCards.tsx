@@ -142,7 +142,7 @@ const cardsData: CardData[] = [
 
 export default function RedCircleCards() {
   return (
-    <section className="relative w-full bg-gradient-to-b from-neutral-950 via-black to-neutral-950 py-32 px-6">
+    <section className="relative w-full bg-black py-32 px-6">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
