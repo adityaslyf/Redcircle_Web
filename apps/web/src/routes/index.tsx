@@ -7,6 +7,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { WorldMapDemo } from "@/components/ui/world-map-demo";
 import RedCircleCards from "@/components/RedCircleCards";
 import { RedCircleTimeline } from "@/components/RedCircleTimeline";
+import Testimonials from "@/components/ui/testimonials";
 
 export const Route = createFileRoute("/")({
 	component: HomeComponent,
@@ -28,6 +29,7 @@ function HomeComponent() {
 			<RedCircleCards />
 			<FeaturesParallax />
 			<RedCircleTimeline />
+			<Testimonials />
 			<AnimatedFooter />
 		</div>
 	);
