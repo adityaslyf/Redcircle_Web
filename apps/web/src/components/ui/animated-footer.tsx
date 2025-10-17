@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { TwitterIcon, GithubIcon, LinkedinIcon, CircleIcon } from "lucide-react";
+import { TwitterIcon, GithubIcon, LinkedinIcon } from "lucide-react";
 
 export function AnimatedFooter() {
   const bandRef = useRef<HTMLDivElement>(null);
@@ -75,7 +75,7 @@ export function AnimatedFooter() {
 
       {/* Large watermark text in the back */}
       <div className="pointer-events-none select-none absolute left-1/2 -translate-x-1/2 bottom-8 md:bottom-12 z-[1]">
-        <div className="text-white/5 font-extrabold uppercase tracking-tight text-6xl md:text-[10rem] leading-none">
+        <div className="text-white/5 font-extrabold uppercase tracking-tight text-6xl md:text-[10rem] leading-none font-1797">
           REDCIRCLE
         </div>
       </div>
@@ -133,7 +133,7 @@ export function AnimatedFooter() {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h3 className="text-xs uppercase tracking-wider text-neutral-500 mb-4">Follow</h3>
+            <h3 className="text-xs uppercase tracking-wider text-neutral-500 mb-4 font-1797">Follow</h3>
             <div className="flex items-center gap-5 text-neutral-400">
               <a className="hover:text-white transition-colors" href="https://twitter.com/adityaslyf" target="_blank" rel="noreferrer" aria-label="Twitter"><TwitterIcon className="w-5 h-5" /></a>
               <a className="hover:text-white transition-colors" href="https://github.com/adityaslyf" target="_blank" rel="noreferrer" aria-label="GitHub"><GithubIcon className="w-5 h-5" /></a>
@@ -163,7 +163,7 @@ function MotionCol({ title, links, delay = 0 }: { title: string; links: { label:
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay }}
     >
-      <h3 className="text-xs uppercase tracking-wider text-neutral-500 mb-4">{title}</h3>
+            <h3 className="text-xs uppercase tracking-wider text-neutral-500 mb-4 font-1797">{title}</h3>
       <ul className="space-y-3">
         {links.map((l) => (
           <li key={l.label}>

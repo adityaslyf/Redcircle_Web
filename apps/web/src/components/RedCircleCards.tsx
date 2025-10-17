@@ -10,16 +10,7 @@ interface CardData {
   socialLinks?: { icon: React.ElementType; url: string }[];
 }
 
-const RedCircleLogo = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 100 100"
-    {...props}
-  >
-    <circle cx="50" cy="50" r="45" fill="currentColor" />
-    <circle cx="50" cy="50" r="30" fill="none" stroke="white" strokeWidth="4" />
-  </svg>
-);
+// removed unused RedCircleLogo
 
 interface GlassCardProps {
   data: CardData;
@@ -44,7 +35,7 @@ const GlassCard = React.forwardRef<HTMLDivElement, GlassCardProps>(
           
           <div className="absolute [transform:translate3d(0,0,26px)]">
             <div className="px-7 pt-[100px] pb-0">
-              <span className="block text-xl font-black text-white">
+              <span className="block text-xl font-black text-white uppercase font-1797">
                 {title}
               </span>
               <span className="mt-5 block text-[15px] text-zinc-300">
@@ -151,7 +142,7 @@ export default function RedCircleCards() {
           transition={{ duration: 0.6 }}
           className="text-center mb-20"
         >
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 font-1797 uppercase">
             How It Works
           </h2>
           <p className="text-xl text-neutral-400 max-w-2xl mx-auto">

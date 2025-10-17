@@ -22,6 +22,7 @@ function HomeComponent() {
 			<BackgroundPaths 
 				title="Turn Viral Posts Into Digital Assets"
 				subtitle="RedCircle tokenizes Reddit content on Solana blockchain, creating a new economy around social media virality."
+				
 			/>
 			
 

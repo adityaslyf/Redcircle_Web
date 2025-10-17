@@ -130,5 +130,69 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "Satoshi", "Inter", "Geist", ui-sans-serif, system-ui, sans-serif;
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Font1797", "Inter", ui-sans-serif, system-ui, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+}
+
+/* Body font: Satoshi */
+@font-face {
+  font-family: "Satoshi";
+  src: url("/src/components/font/Satoshi-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/src/components/font/Satoshi-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/src/components/font/Satoshi-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/src/components/font/Satoshi-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Display font: 1797 */
+@font-face {
+  font-family: "Font1797";
+  src: url("/src/components/font/1797/1797-POSTER.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Font1797";
+  src: url("/src/components/font/1797/1797-MEDIUM.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Font1797";
+  src: url("/src/components/font/1797/1797-COMPRESSED.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-1797 {
+  font-family: "Font1797", "Inter", ui-sans-serif, system-ui, sans-serif !important;
+  font-feature-settings: "liga" 0;
 }

@@ -51,6 +51,7 @@ export default function Navbar() {
 						letterSpacing: "-0.03em",
 						color: "#ffffff",
 					}}
+					className="font-1797 uppercase"
 				>
 					Redcircle
 				</span>

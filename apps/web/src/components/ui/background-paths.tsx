@@ -73,7 +73,7 @@ export function BackgroundPaths({
 					transition={{ duration: 2 }}
 					className="max-w-4xl mx-auto"
 				>
-					<h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-8 tracking-tighter">
+					<h1 className="text-5xl sm:text-7xl md:text-8xl font-bold mb-8 tracking-tight font-1797 uppercase">
 						{words.map((word, wordIndex) => (
 							<span
 								key={wordIndex}
@@ -108,7 +108,7 @@ export function BackgroundPaths({
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.5, duration: 0.8 }}
-							className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 mb-12 max-w-3xl mx-auto leading-relaxed"
+							className="text-lg md:text-xl text-neutral-600 dark:text-neutral-400 mb-12 max-w-3xl mx-auto leading-relaxed font-1797 uppercase"
 						>
 							{subtitle}
 						</motion.p>
@@ -128,7 +128,7 @@ export function BackgroundPaths({
                             bg-white/95 hover:bg-white/100 dark:bg-black/95 dark:hover:bg-black/100 
                             text-black dark:text-white transition-all duration-300 
                             group-hover:-translate-y-0.5 border border-black/10 dark:border-white/10
-                            hover:shadow-md dark:hover:shadow-neutral-800/50"
+                            hover:shadow-md dark:hover:shadow-neutral-800/50 font-1797 uppercase"
 						>
 							<span className="opacity-90 group-hover:opacity-100 transition-opacity">
 								Start Trading Now
