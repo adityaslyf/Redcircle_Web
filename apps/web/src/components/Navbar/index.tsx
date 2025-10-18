@@ -9,9 +9,9 @@ const items = [
 		ariaLabel: "Go to home page",
 	},
 	{
-		label: "Feed",
-		link: "/feed",
-		ariaLabel: "Browse live feed",
+		label: "Dashboard",
+		link: "/dashboard",
+		ariaLabel: "Open dashboard",
 	},
 	{
 		label: "Features",

@@ -156,7 +156,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "terminal", label: "Terminal" },
 ];
 
-export default function RedditFeed() {
+export default function RedditFeed({ sideFilters = false }: { sideFilters?: boolean }) {
   const [active, setActive] = useState<TabKey>("all");
   const posts = useMemo(() => MOCK_POSTS, []);
 
@@ -178,47 +178,69 @@ export default function RedditFeed() {
 
   return (
     <section id="feed" className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-      {/* Sticky header */}
-      <div className="z-40 mb-6 border-b border-white/10 bg-black/80 py-3 backdrop-blur supports-[backdrop-filter]:bg-black/60 sm:top-24 sm:mb-8">
-        <div className="flex items-center justify-between">
-          <motion.h2
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-lg font-semibold text-white sm:text-xl"
-          >
-            Feed
-          </motion.h2>
-          <nav className="relative">
-            <ul className="flex gap-2 rounded-xl border border-white/10 bg-white/5 p-1 text-sm text-white/80">
-              {TABS.map((t) => {
-                const isActive = active === t.key;
-                return (
-                  <li key={t.key}>
-                    <button
-                      onClick={() => setActive(t.key)}
-                      className={
-                        "relative rounded-lg px-3 py-1 transition-colors" +
-                        (isActive ? " bg-white/15 text-white" : " hover:bg-white/10")
-                      }
-                    >
-                      {t.label}
-                      {isActive && (
-                        <motion.span
-                          layoutId="tab-underline"
-                          className="absolute inset-0 -z-10 rounded-lg border border-white/15"
-                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                        />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+      {sideFilters ? (
+        <aside className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 sm:flex">
+          <h3 className="mb-2 pl-1 text-xs uppercase tracking-wider text-white/50">Feed</h3>
+          {TABS.map((t) => {
+            const isActive = active === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setActive(t.key)}
+                className={
+                  "rounded-xl border px-3 py-2 text-sm transition-colors " +
+                  (isActive
+                    ? "border-white/20 bg-white/15 text-white"
+                    : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10")
+                }
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </aside>
+      ) : (
+        <div className="z-40 mb-6 border-b border-white/10 bg-black/80 py-3 backdrop-blur supports-[backdrop-filter]:bg-black/60 sm:top-24 sm:mb-8">
+          <div className="flex items-center justify-between">
+            <motion.h2
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="text-lg font-semibold text-white sm:text-xl"
+            >
+              Feed
+            </motion.h2>
+            <nav className="relative">
+              <ul className="flex gap-2 rounded-xl border border-white/10 bg-white/5 p-1 text-sm text-white/80">
+                {TABS.map((t) => {
+                  const isActive = active === t.key;
+                  return (
+                    <li key={t.key}>
+                      <button
+                        onClick={() => setActive(t.key)}
+                        className={
+                          "relative rounded-lg px-3 py-1 transition-colors" +
+                          (isActive ? " bg-white/15 text-white" : " hover:bg-white/10")
+                        }
+                      >
+                        {t.label}
+                        {isActive && (
+                          <motion.span
+                            layoutId="tab-underline"
+                            className="absolute inset-0 -z-10 rounded-lg border border-white/15"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                          />
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
