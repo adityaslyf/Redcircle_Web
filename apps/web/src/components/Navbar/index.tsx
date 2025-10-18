@@ -9,6 +9,11 @@ const items = [
 		ariaLabel: "Go to home page",
 	},
 	{
+		label: "Feed",
+		link: "/feed",
+		ariaLabel: "Browse live feed",
+	},
+	{
 		label: "Features",
 		link: "#features",
 		ariaLabel: "View features",
@@ -57,12 +62,11 @@ export default function Navbar() {
 					<div className="flex items-center justify-between w-full gap-4">
 						<span
 							style={{
-								fontWeight: 700,
-								fontSize: "1.5rem",
-								letterSpacing: "-0.03em",
+								fontWeight: 800,
+								fontSize: "1.25rem",
+								letterSpacing: "-0.02em",
 								color: "#ffffff",
 							}}
-							className="font-1797 uppercase"
 						>
 							Redcircle
 						</span>
