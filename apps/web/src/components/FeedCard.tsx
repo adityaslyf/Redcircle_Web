@@ -44,16 +44,27 @@ export default function FeedCard({ post, className, onTrade }: FeedCardProps) {
       transition={{ duration: 0.5, ease: "easeOut" }}
       whileHover={{ y: -4 }}
       className={cn(
-        "group relative overflow-hidden rounded-3xl border border-white/20 bg-black/60 p-4 sm:p-5",
-        "shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset,0_20px_40px_-20px_rgba(0,0,0,0.6)]",
-        "ring-1 ring-white/10 backdrop-blur-md",
+        "group relative overflow-hidden rounded-3xl border border-white/15 bg-black/60 p-4 sm:p-5",
+        "shadow-[0_0_0_1px_rgba(255,255,255,0.05)_inset,0_16px_28px_-18px_rgba(0,0,0,0.6)]",
+        "ring-1 ring-white/10 backdrop-blur",
         className,
       )}
     >
+      {/* Left accent bar */}
+      <div
+        aria-hidden
+        className={cn(
+          "absolute left-0 top-0 h-full w-[3px] opacity-80",
+          post.isTrending
+            ? "bg-gradient-to-b from-red-500/70 via-fuchsia-500/70 to-blue-500/70"
+            : "bg-white/15",
+        )}
+      />
+
       {/* Glow accent */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-40"
+        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-25"
         style={{
           background:
             "radial-gradient(600px 200px at 10% 0%, rgba(239,68,68,0.18), rgba(0,0,0,0)), radial-gradient(600px 200px at 90% 100%, rgba(59,130,246,0.18), rgba(0,0,0,0))",

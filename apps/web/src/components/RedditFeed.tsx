@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import FeedCard, { type FeedPost } from "@/components/FeedCard";
 
@@ -147,36 +147,82 @@ const MOCK_POSTS: FeedPost[] = [
   },
 ];
 
+type TabKey = "all" | "trending" | "new" | "terminal";
+
+const TABS: { key: TabKey; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "trending", label: "Trending" },
+  { key: "new", label: "New" },
+  { key: "terminal", label: "Terminal" },
+];
+
 export default function RedditFeed() {
+  const [active, setActive] = useState<TabKey>("all");
   const posts = useMemo(() => MOCK_POSTS, []);
+
+  const filtered = useMemo(() => {
+    switch (active) {
+      case "trending":
+        return posts.filter((p) => p.isTrending || (p.upvotes ?? 0) > 10000);
+      case "new":
+        return [...posts].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        );
+      case "terminal":
+        // Placeholder: In future, filter posts tagged as terminal/tradable-only
+        return posts.slice(0, Math.max(1, Math.floor(posts.length / 2)));
+      default:
+        return posts;
+    }
+  }, [active, posts]);
 
   return (
     <section id="feed" className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-      {/* Section header */}
-      <div className="mb-8 sm:mb-10">
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="font-1797 uppercase text-2xl text-white sm:text-3xl"
-        >
-          Live Tradeable Feed
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-          className="mt-2 max-w-2xl text-sm text-white/70"
-        >
-          Tokenize high-signal Reddit posts. Trade momentum. Earn the upside.
-        </motion.p>
+      {/* Sticky header */}
+      <div className="z-40 mb-6 border-b border-white/10 bg-black/80 py-3 backdrop-blur supports-[backdrop-filter]:bg-black/60 sm:top-24 sm:mb-8">
+        <div className="flex items-center justify-between">
+          <motion.h2
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4 }}
+            className="text-lg font-semibold text-white sm:text-xl"
+          >
+            Feed
+          </motion.h2>
+          <nav className="relative">
+            <ul className="flex gap-2 rounded-xl border border-white/10 bg-white/5 p-1 text-sm text-white/80">
+              {TABS.map((t) => {
+                const isActive = active === t.key;
+                return (
+                  <li key={t.key}>
+                    <button
+                      onClick={() => setActive(t.key)}
+                      className={
+                        "relative rounded-lg px-3 py-1 transition-colors" +
+                        (isActive ? " bg-white/15 text-white" : " hover:bg-white/10")
+                      }
+                    >
+                      {t.label}
+                      {isActive && (
+                        <motion.span
+                          layoutId="tab-underline"
+                          className="absolute inset-0 -z-10 rounded-lg border border-white/15"
+                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        />
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </div>
       </div>
 
       {/* Grid */}
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post) => (
+        {filtered.map((post) => (
           <FeedCard key={post.id} post={post} />
         ))}
       </div>
