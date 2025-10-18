@@ -4,13 +4,15 @@ import { motion, AnimatePresence } from "motion/react";
 import RedditFeed from "@/components/RedditFeed";
 import Leaderboard from "../components/Leaderboard";
 import ProfilePanel from "../components/ProfilePanel";
+import LaunchPanel from "../components/LaunchPanel";
 import { SplashCursor } from "@/components/ui/splash-cursor";
 
-type TabKey = "feed" | "leaderboard" | "profile";
+type TabKey = "feed" | "leaderboard" | "profile" | "launch";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "feed", label: "Feed" },
   { key: "leaderboard", label: "Leaderboard" },
+  { key: "launch", label: "Launch" },
   { key: "profile", label: "Profile" },
 ];
 
@@ -60,9 +62,18 @@ function DashboardPage() {
               <Leaderboard sideFilters />
             </motion.div>
           )}
+          {active === "launch" && (
+            <motion.div key="launch" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+              <div className="mx-auto max-w-5xl">
+                <LaunchPanel />
+              </div>
+            </motion.div>
+          )}
           {active === "profile" && (
             <motion.div key="profile" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
-              <ProfilePanel />
+              <div className="mx-auto max-w-5xl">
+                <ProfilePanel />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
