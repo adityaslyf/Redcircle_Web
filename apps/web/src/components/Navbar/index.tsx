@@ -49,12 +49,48 @@ const socialItems = [
 export default function Navbar() {
 	const { isAuthenticated } = useAuth();
 
+	// Dynamically build menu items based on auth status
+	const menuItems = isAuthenticated
+		? [
+				{
+					label: "Home",
+					link: "/",
+					ariaLabel: "Go to home page",
+				},
+				{
+					label: "Dashboard",
+					link: "/dashboard",
+					ariaLabel: "Open dashboard",
+				},
+				{
+					label: "Launch",
+					link: "/launch",
+					ariaLabel: "Launch a post",
+				},
+				{
+					label: "Features",
+					link: "#features",
+					ariaLabel: "View features",
+				},
+				{
+					label: "About",
+					link: "#about",
+					ariaLabel: "Learn about us",
+				},
+				{
+					label: "Contact",
+					link: "#contact",
+					ariaLabel: "Contact us",
+				},
+		  ]
+		: items;
+
 	return (
 		<>
 			<StaggeredMenu
 				position="right"
 				colors={["#0a0a0a", "#1a1a1a"]}
-				items={items}
+				items={menuItems}
 				socialItems={socialItems}
 				displaySocials={true}
 				displayItemNumbering={true}

@@ -6,7 +6,7 @@ import Leaderboard from "../components/Leaderboard";
 import ProfilePanel from "../components/ProfilePanel";
 import LaunchPanel from "../components/LaunchPanel";
 
-type TabKey = "feed" | "leaderboard" | "profile" | "launch";
+type TabKey = "feed" | "leaderboard" | "launch" | "profile";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "feed", label: "Feed" },

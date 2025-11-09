@@ -95,9 +95,9 @@ router.get("/auth/reddit/callback", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // Redirect to frontend with token and user
+    // Redirect to frontend signin page with token and user
     res.redirect(
-      `${FRONTEND_URL}/?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`
+      `${FRONTEND_URL}/signin?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`
     );
   } catch (error) {
     console.error("❌ Auth error:", error);
