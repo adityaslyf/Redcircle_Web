@@ -5,7 +5,6 @@ import RedditFeed from "@/components/RedditFeed";
 import Leaderboard from "../components/Leaderboard";
 import ProfilePanel from "../components/ProfilePanel";
 import LaunchPanel from "../components/LaunchPanel";
-import { SplashCursor } from "@/components/ui/splash-cursor";
 
 type TabKey = "feed" | "leaderboard" | "profile" | "launch";
 
@@ -25,8 +24,6 @@ function DashboardPage() {
 
   return (
     <div className="relative min-h-screen">
-      <SplashCursor />
-
       {/* Left vertical dashboard nav */}
       <aside className="fixed left-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 sm:flex">
         <h2 className="mb-2 pl-1 text-xs uppercase tracking-wider text-white/50">Dashboard</h2>
