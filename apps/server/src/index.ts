@@ -2,6 +2,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import redditAuthRoutes from "./config/reddit-oauth-simple";
+import postsRoutes from "./routes/posts";
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(
 
 // Routes
 app.use(redditAuthRoutes);
+app.use("/api/posts", postsRoutes);
 
 app.get("/", (_req, res) => {
 	res.status(200).json({ message: "RedCircle API is running" });
