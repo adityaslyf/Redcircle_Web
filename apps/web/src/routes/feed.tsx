@@ -7,8 +7,8 @@ export const Route = createFileRoute("/feed")({
 
 function FeedPage() {
   return (
-    <div className="relative flex min-h-screen flex-col">
-      <div className="mx-auto w-full max-w-7xl pt-28 pb-20">
+    <div className="relative flex min-h-screen flex-col pt-24">
+      <div className="mx-auto w-full max-w-7xl pt-8 pb-20">
         <RedditFeed />
       </div>
     </div>
