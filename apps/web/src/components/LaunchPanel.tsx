@@ -345,7 +345,7 @@ export default function LaunchPanel() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-2xl border border-purple-500/50 bg-gradient-to-r from-purple-500/20 to-blue-500/20 px-8 py-6 text-white font-semibold hover:from-purple-500/30 hover:to-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20"
+              className="rounded-2xl border border-purple-500/50 bg-gradient-to-r from-purple-500/20 to-blue-500/20 px-8 py-6 text-white font-semibold hover:from-purple-500/30 hover:to-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20 z-10000 cursor-pointer"
             >
               {isSubmitting ? (
                 <>
@@ -354,7 +354,6 @@ export default function LaunchPanel() {
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5 mr-2" />
                   Launch Token
                 </>
               )}
