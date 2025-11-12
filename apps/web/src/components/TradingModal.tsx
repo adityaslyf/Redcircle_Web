@@ -1,12 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, TrendingUp, TrendingDown, Wallet, ArrowRightLeft } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { Connection } from "@solana/web3.js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { FeedPost } from "@/components/FeedCard";
 import { cn } from "@/lib/utils";
+import { fetchWithAuth, getApiUrl } from "@/lib/auth";
 
 type TradeType = "buy" | "sell";
 
@@ -17,37 +19,94 @@ type TradingModalProps = {
 };
 
 export default function TradingModal({ post, isOpen, onClose }: TradingModalProps) {
-  const { connected, publicKey } = useWallet();
+  const { connected, publicKey, sendTransaction } = useWallet();
   const { setVisible } = useWalletModal();
   const [tradeType, setTradeType] = useState<TradeType>("buy");
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  interface TradingStats {
+    currentPrice: number;
+    totalSupply: number;
+    soldSupply: number;
+    availableSupply: number;
+    totalVolume: number;
+    marketCap: number;
+    holders: number;
+    buyPrice1: number;
+    buyPrice10: number;
+    buyPrice100: number;
+  }
 
-  // Calculate trade preview
+  const [tradingStats, setTradingStats] = useState<TradingStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(false);
+
+  const fetchTradingStats = async () => {
+    setLoadingStats(true);
+    try {
+      const response = await fetchWithAuth(`/api/trading/stats/${post.id}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setTradingStats(data.stats);
+      }
+    } catch (error) {
+      console.error("Failed to fetch trading stats:", error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  // Fetch trading stats when modal opens
+  useEffect(() => {
+    if (isOpen && post.id) {
+      fetchTradingStats();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, post.id]);
+
+  // Calculate trade preview using bonding curve
   const tradePreview = useMemo(() => {
     const tokenAmount = parseFloat(amount) || 0;
-    const tokenPrice = post.tokenPrice || 0;
-    const totalCost = tokenAmount * tokenPrice;
     
-    // Simple 0.5% trading fee
-    const fee = totalCost * 0.005;
-    const finalTotal = totalCost + fee;
+    if (!tradingStats || tokenAmount === 0) {
+      return {
+        tokenAmount: 0,
+        tokenPrice: post.tokenPrice || 0,
+        totalCost: 0,
+        fee: 0,
+        finalTotal: 0,
+      };
+    }
+
+    // Use backend bonding curve calculations
+    let totalCost = 0;
+    
+    if (tradeType === "buy") {
+      // Approximate using current price (backend will calculate exact)
+      totalCost = tokenAmount * tradingStats.currentPrice;
+    } else {
+      // Sell includes 5% platform fee
+      totalCost = tokenAmount * tradingStats.currentPrice * 0.95;
+    }
+    
+    const fee = tradeType === "buy" ? totalCost * 0.005 : totalCost * 0.05;
+    const finalTotal = totalCost;
 
     return {
       tokenAmount,
-      tokenPrice,
+      tokenPrice: tradingStats.currentPrice,
       totalCost,
       fee,
       finalTotal,
     };
-  }, [amount, post.tokenPrice]);
+  }, [amount, tradingStats, tradeType, post.tokenPrice]);
 
   const handleConnectWallet = () => {
     setVisible(true);
   };
 
   const handleTrade = async () => {
-    if (!connected) {
+    if (!connected || !publicKey) {
       handleConnectWallet();
       return;
     }
@@ -57,32 +116,121 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
       return;
     }
 
+    if (!sendTransaction) {
+      alert("Wallet does not support sending transactions");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
-      // TODO: Implement actual trading logic with Solana blockchain
-      // This would involve:
-      // 1. Create transaction to interact with token program
-      // 2. Sign transaction with wallet
-      // 3. Send transaction to Solana network
-      // 4. Wait for confirmation
-      // 5. Update backend with trade details
+      const walletAddress = publicKey.toBase58();
       
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
+      // Step 1: Request transaction from backend
+      console.log(`🔄 Preparing ${tradeType} transaction...`);
+      const endpoint = tradeType === "buy" ? "/api/trading/buy" : "/api/trading/sell";
       
+      const response = await fetchWithAuth(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId: post.id,
+          amount: parseInt(amount),
+          walletAddress,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.details || data.error || "Transaction failed");
+      }
+
+      console.log("✅ Transaction prepared by backend");
+      console.log(`   Cost: ${data.cost?.toFixed(6)} SOL`);
+
+      // Step 2: Deserialize partially-signed transaction
+      const { Transaction, VersionedTransaction } = await import("@solana/web3.js");
+      const transactionBuffer = Buffer.from(data.transaction, "base64");
+      const transaction = Transaction.from(transactionBuffer);
+
+      // Step 3: Get connection
+      const rpcUrl = import.meta.env.VITE_SOLANA_RPC_URL || "https://api.devnet.solana.com";
+      const connection = new Connection(rpcUrl, "confirmed");
+
+      console.log("📋 Transaction details:");
+      console.log(`   Fee payer: ${transaction.feePayer?.toBase58()}`);
+      console.log(`   Recent blockhash: ${transaction.recentBlockhash}`);
+      console.log(`   Signatures count: ${transaction.signatures.length}`);
+
+      // Step 4: Send transaction (wallet will add its signature and send)
+      console.log("🔑 Requesting wallet to sign and send transaction...");
+      const signature = await sendTransaction(transaction, connection, {
+        skipPreflight: false,
+        preflightCommitment: "confirmed",
+        signers: [], // Authority already signed on backend
+      });
+
+      console.log("⏳ Waiting for confirmation...");
+      console.log(`   Signature: ${signature}`);
+
+      // Step 5: Wait for confirmation
+      const latestBlockhash = await connection.getLatestBlockhash();
+      const confirmation = await connection.confirmTransaction({
+        signature,
+        blockhash: latestBlockhash.blockhash,
+        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+      }, "confirmed");
+
+      if (confirmation.value.err) {
+        throw new Error(`Transaction failed: ${JSON.stringify(confirmation.value.err)}`);
+      }
+
+      console.log("✅ Transaction confirmed!");
+
+      // Step 7: Notify backend of confirmation
+      await fetchWithAuth("/api/trading/confirm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          signature,
+          postId: post.id,
+          type: tradeType,
+        }),
+      });
+
+      // Success!
       alert(
         `🎉 ${tradeType === "buy" ? "Purchase" : "Sale"} Successful!\n\n` +
         `${tradePreview.tokenAmount} tokens ${tradeType === "buy" ? "bought" : "sold"}\n` +
-        `Total: ${tradePreview.finalTotal.toFixed(4)} SOL\n` +
-        `Wallet: ${publicKey?.toBase58().slice(0, 8)}...\n\n` +
-        `Note: This is a demo. Actual blockchain transaction coming soon.`
+        `Total: ${tradePreview.finalTotal.toFixed(6)} SOL\n` +
+        `Transaction: ${signature.slice(0, 16)}...\n\n` +
+        `View on Solscan:\nhttps://solscan.io/tx/${signature}?cluster=devnet`
       );
       
+      // Refresh stats and close
+      await fetchTradingStats();
       onClose();
       setAmount("");
     } catch (error) {
-      console.error("Trade error:", error);
-      alert("Trade failed. Please try again.");
+      console.error("❌ Trade error:", error);
+      
+      let errorMessage = "Trade failed. ";
+      if (error instanceof Error) {
+        if (error.message?.includes("User rejected")) {
+          errorMessage += "Transaction was cancelled.";
+        } else {
+          errorMessage += error.message;
+        }
+      } else {
+        errorMessage += "Please try again.";
+      }
+      
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -153,13 +301,46 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
                       <span>•</span>
                       <span>u/{post.author}</span>
                     </div>
-                    {post.marketCap && (
-                      <div className="mt-2 flex gap-4 text-xs text-white/50">
-                        <span>MC: {post.marketCap.toLocaleString()} SOL</span>
-                        {post.volume24h && (
-                          <span>Vol: {post.volume24h.toLocaleString()} SOL</span>
-                        )}
+                    
+                    {/* Trading Stats */}
+                    {loadingStats ? (
+                      <div className="mt-3 text-xs text-white/50">Loading stats...</div>
+                    ) : tradingStats ? (
+                      <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
+                        <div>
+                          <div className="text-white/50">Current Price</div>
+                          <div className="font-semibold text-white">
+                            {tradingStats.currentPrice.toFixed(6)} SOL
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-white/50">Available</div>
+                          <div className="font-semibold text-white">
+                            {tradingStats.availableSupply.toLocaleString()}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-white/50">Volume</div>
+                          <div className="font-semibold text-white">
+                            {tradingStats.totalVolume.toFixed(3)} SOL
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-white/50">Holders</div>
+                          <div className="font-semibold text-white">
+                            {tradingStats.holders}
+                          </div>
+                        </div>
                       </div>
+                    ) : (
+                      post.marketCap && (
+                        <div className="mt-2 flex gap-4 text-xs text-white/50">
+                          <span>MC: {post.marketCap.toLocaleString()} SOL</span>
+                          {post.volume24h && (
+                            <span>Vol: {post.volume24h.toLocaleString()} SOL</span>
+                          )}
+                        </div>
+                      )
                     )}
                   </div>
                 </div>

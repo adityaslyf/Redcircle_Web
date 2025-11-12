@@ -1,8 +1,10 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
+import { RefreshCw } from "lucide-react";
 import FeedCard, { type FeedPost } from "@/components/FeedCard";
 import TradingModal from "@/components/TradingModal";
 import { getApiUrl } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
 
 const MOCK_POSTS: FeedPost[] = [
   {
@@ -183,12 +185,16 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
   const [error, setError] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<FeedPost | null>(null);
   const [isTradingModalOpen, setIsTradingModalOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Fetch posts from backend
-  useEffect(() => {
-    const fetchPosts = async () => {
+  const fetchPosts = useCallback(async (showRefreshing = false) => {
       try {
-        setLoading(true);
+        if (showRefreshing) {
+          setIsRefreshing(true);
+        } else {
+          setLoading(true);
+        }
         setError(null);
         
         const apiUrl = getApiUrl();
@@ -232,11 +238,19 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         setPosts(MOCK_POSTS);
       } finally {
         setLoading(false);
+        setIsRefreshing(false);
       }
-    };
-    
+    }, []);
+
+  // Initial fetch
+  useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
+
+  // Handle manual refresh
+  const handleRefresh = () => {
+    fetchPosts(true);
+  };
 
   const filtered = useMemo(() => {
     switch (active) {
@@ -295,33 +309,50 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
             >
               Feed
             </motion.h2>
-            <nav className="relative">
-              <ul className="flex gap-2 rounded-xl border border-white/10 bg-white/5 p-1 text-sm text-white/80">
-                {TABS.map((t) => {
-                  const isActive = active === t.key;
-                  return (
-                    <li key={t.key}>
-                      <button
-                        onClick={() => setActive(t.key)}
-                        className={
-                          "relative rounded-lg px-3 py-1 transition-colors" +
-                          (isActive ? " bg-white/15 text-white" : " hover:bg-white/10")
-                        }
-                      >
-                        {t.label}
-                        {isActive && (
-                          <motion.span
-                            layoutId="tab-underline"
-                            className="absolute inset-0 -z-10 rounded-lg border border-white/15"
-                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                          />
-                        )}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
+            <div className="flex items-center gap-3">
+              {/* Refresh Button */}
+              <Button
+                onClick={handleRefresh}
+                disabled={isRefreshing || loading}
+                variant="ghost"
+                size="sm"
+                className="h-8 border border-white/10 bg-white/5 px-3 text-white/80 hover:bg-white/10 hover:text-white disabled:opacity-50"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span className="ml-2 hidden sm:inline">
+                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
+                </span>
+              </Button>
+              
+              {/* Tabs */}
+              <nav className="relative">
+                <ul className="flex gap-2 rounded-xl border border-white/10 bg-white/5 p-1 text-sm text-white/80">
+                  {TABS.map((t) => {
+                    const isActive = active === t.key;
+                    return (
+                      <li key={t.key}>
+                        <button
+                          onClick={() => setActive(t.key)}
+                          className={
+                            "relative rounded-lg px-3 py-1 transition-colors" +
+                            (isActive ? " bg-white/15 text-white" : " hover:bg-white/10")
+                          }
+                        >
+                          {t.label}
+                          {isActive && (
+                            <motion.span
+                              layoutId="tab-underline"
+                              className="absolute inset-0 -z-10 rounded-lg border border-white/15"
+                              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                            />
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+            </div>
           </div>
         </div>
       )}
