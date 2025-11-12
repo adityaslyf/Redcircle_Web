@@ -186,9 +186,12 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
   const [selectedPost, setSelectedPost] = useState<FeedPost | null>(null);
   const [isTradingModalOpen, setIsTradingModalOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Fetch posts from backend
-  const fetchPosts = useCallback(async (showRefreshing = false) => {
+  const fetchPosts = useCallback(async (showRefreshing = false, resetOffset = true) => {
       try {
         if (showRefreshing) {
           setIsRefreshing(true);
@@ -197,9 +200,11 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         }
         setError(null);
         
+        const currentOffset = resetOffset ? 0 : offset;
+        
         const apiUrl = getApiUrl();
-        // Fetch all posts including pending ones (status=all)
-        const response = await fetch(`${apiUrl}/api/posts?status=all&limit=100`);
+        // Fetch posts with pagination
+        const response = await fetch(`${apiUrl}/api/posts?status=all&limit=20&offset=${currentOffset}`);
         
         if (!response.ok) {
           throw new Error("Failed to fetch posts");
@@ -208,9 +213,8 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         const data = await response.json();
         
         console.log("📦 Fetched posts from backend:", data.posts?.length || 0);
-        if (data.posts?.length > 0) {
-          console.log("📝 First post:", data.posts[0]);
-        }
+        console.log("📄 Pagination:", data.pagination);
+        console.log("🔄 Has more:", data.hasMore);
         
         // Transform backend data to FeedPost format
         const transformedPosts: FeedPost[] = (data.posts || []).map((post: BackendPost) => ({
@@ -230,7 +234,18 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         }));
         
         console.log("✅ Transformed posts:", transformedPosts.length);
-        setPosts(transformedPosts);
+        
+        // Update posts based on whether we're resetting or appending
+        if (resetOffset) {
+          setPosts(transformedPosts);
+          setOffset(transformedPosts.length);
+        } else {
+          setPosts((prev) => [...prev, ...transformedPosts]);
+          setOffset((prev) => prev + transformedPosts.length);
+        }
+        
+        // Update hasMore flag
+        setHasMore(data.hasMore || false);
       } catch (err) {
         console.error("Error fetching posts:", err);
         setError(err instanceof Error ? err.message : "Failed to load posts");
@@ -240,17 +255,47 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         setLoading(false);
         setIsRefreshing(false);
       }
-    }, []);
+    }, [offset]);
+
+  // Load more posts
+  const loadMorePosts = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    
+    setLoadingMore(true);
+    try {
+      await fetchPosts(false, false);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, fetchPosts]);
 
   // Initial fetch
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    fetchPosts(true, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle manual refresh
   const handleRefresh = () => {
-    fetchPosts(true);
+    fetchPosts(true, true);
   };
+
+  // Infinite scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight;
+      const scrollTop = document.documentElement.scrollTop;
+      const clientHeight = document.documentElement.clientHeight;
+      
+      // Load more when user is 300px from bottom
+      if (scrollHeight - scrollTop - clientHeight < 300 && hasMore && !loadingMore) {
+        loadMorePosts();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [hasMore, loadingMore, loadMorePosts]);
 
   const filtered = useMemo(() => {
     switch (active) {
@@ -389,11 +434,32 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
 
       {/* Posts Grid */}
       {!loading && filtered.length > 0 && (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((post) => (
-            <FeedCard key={post.id} post={post} onTrade={handleTrade} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((post) => (
+              <FeedCard key={post.id} post={post} onTrade={handleTrade} />
+            ))}
+          </div>
+
+          {/* Load More Indicator */}
+          {loadingMore && (
+            <div className="mt-8 flex justify-center">
+              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-6 py-3">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
+                <span className="text-sm text-white/70">Loading more posts...</span>
+              </div>
+            </div>
+          )}
+
+          {/* End of Results */}
+          {!hasMore && !loadingMore && (
+            <div className="mt-8 text-center">
+              <p className="text-sm text-white/50">
+                🎉 You've reached the end! No more posts to load.
+              </p>
+            </div>
+          )}
+        </>
       )}
       </section>
 

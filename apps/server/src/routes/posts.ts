@@ -230,43 +230,55 @@ router.get("/", async (req, res) => {
 
     console.log(`📋 Fetching posts: status=${status}, limit=${limit}, offset=${offset}`);
 
-    let query = db
-      .select()
-      .from(posts)
+    // Build query based on filters
+    const baseQuery = db.select().from(posts);
+    
+    // Apply filters
+    const conditions = [];
+    if (status && status !== "all") {
+      conditions.push(eq(posts.status, status));
+    }
+    if (subreddit) {
+      conditions.push(eq(posts.subreddit, subreddit as string));
+    }
+
+    // Determine sort column
+    let orderColumn;
+    switch (sortBy) {
+      case "upvotes":
+        orderColumn = desc(posts.upvotes);
+        break;
+      case "marketCap":
+        orderColumn = desc(posts.marketCap);
+        break;
+      case "totalVolume":
+        orderColumn = desc(posts.totalVolume);
+        break;
+      default:
+        orderColumn = desc(posts.tokenizedAt);
+    }
+
+    // Execute query with all filters
+    const postsList = await (conditions.length > 0
+      ? baseQuery.where(conditions[0]).orderBy(orderColumn)
+      : baseQuery.orderBy(orderColumn)
+    )
       .limit(parseInt(limit as string))
       .offset(parseInt(offset as string));
 
-    // Filter by status if specified
-    if (status && status !== "all") {
-      query = query.where(eq(posts.status, status as any));
-    }
-
-    // Filter by subreddit if specified
-    if (subreddit) {
-      query = query.where(eq(posts.subreddit, subreddit as string));
-    }
-
-    // Sort
-    switch (sortBy) {
-      case "upvotes":
-        query = query.orderBy(desc(posts.upvotes));
-        break;
-      case "marketCap":
-        query = query.orderBy(desc(posts.marketCap));
-        break;
-      case "totalVolume":
-        query = query.orderBy(desc(posts.totalVolume));
-        break;
-      default:
-        query = query.orderBy(desc(posts.tokenizedAt));
-    }
-
-    const postsList = await query;
+    // Check if there are more posts by fetching one extra
+    const hasMore = postsList.length === parseInt(limit as string);
 
     res.json({
       success: true,
       posts: postsList,
       count: postsList.length,
+      hasMore,
+      pagination: {
+        limit: parseInt(limit as string),
+        offset: parseInt(offset as string),
+        nextOffset: parseInt(offset as string) + postsList.length,
+      },
     });
   } catch (error) {
     console.error("❌ Error fetching posts:", error);
