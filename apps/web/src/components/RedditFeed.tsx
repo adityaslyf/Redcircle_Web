@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { motion } from "motion/react";
 import FeedCard, { type FeedPost } from "@/components/FeedCard";
+import TradingModal from "@/components/TradingModal";
 import { getApiUrl } from "@/lib/auth";
 
 const MOCK_POSTS: FeedPost[] = [
@@ -180,6 +181,8 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPost, setSelectedPost] = useState<FeedPost | null>(null);
+  const [isTradingModalOpen, setIsTradingModalOpen] = useState(false);
 
   // Fetch posts from backend
   useEffect(() => {
@@ -251,8 +254,14 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
     }
   }, [active, posts]);
 
+  const handleTrade = (post: FeedPost) => {
+    setSelectedPost(post);
+    setIsTradingModalOpen(true);
+  };
+
   return (
-    <section id="feed" className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+    <>
+      <section id="feed" className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
       {sideFilters ? (
         <aside className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 sm:flex">
           <h3 className="mb-2 pl-1 text-xs uppercase tracking-wider text-white/50">Feed</h3>
@@ -351,11 +360,24 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
       {!loading && filtered.length > 0 && (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((post) => (
-            <FeedCard key={post.id} post={post} />
+            <FeedCard key={post.id} post={post} onTrade={handleTrade} />
           ))}
         </div>
       )}
-    </section>
+      </section>
+
+      {/* Trading Modal */}
+      {selectedPost && (
+        <TradingModal
+          post={selectedPost}
+          isOpen={isTradingModalOpen}
+          onClose={() => {
+            setIsTradingModalOpen(false);
+            setSelectedPost(null);
+          }}
+        />
+      )}
+    </>
   );
 }
 
