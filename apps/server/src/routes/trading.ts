@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { buyTokens, sellTokens, getTradingStats } from "../services/trading.service";
 import { authenticateToken } from "../middleware/auth";
+import { db } from "@Redcircle/db";
+import * as schema from "@Redcircle/db";
+import { eq, and } from "drizzle-orm";
+
+const { holdings } = schema;
 
 const router = Router();
 
@@ -115,23 +120,102 @@ router.get("/stats/:postId", async (req, res) => {
 
 /**
  * POST /api/trading/confirm
- * Confirm transaction after user signs (webhook for transaction monitoring)
+ * Confirm transaction and update holdings
  */
 router.post("/confirm", authenticateToken, async (req, res) => {
   try {
-    const { signature, postId, type } = req.body;
+    const { signature, postId, type, amount, price } = req.body;
+    const userId = (req as any).userId;
 
     console.log(`\n✅ Transaction confirmed: ${signature}`);
     console.log(`   Post: ${postId}`);
     console.log(`   Type: ${type}`);
+    console.log(`   User: ${userId}`);
 
-    // TODO: Monitor transaction on blockchain
-    // TODO: Update user balances in database
-    // TODO: Create transaction history record
+    // Get post details
+    const [post] = await db
+      .select()
+      .from(schema.posts)
+      .where(eq(schema.posts.id, postId))
+      .limit(1);
+
+    if (!post || !post.tokenMintAddress) {
+      throw new Error("Post or token mint not found");
+    }
+
+    // Get or create user holding
+    const [existingHolding] = await db
+      .select()
+      .from(holdings)
+      .where(
+        and(
+          eq(holdings.userId, userId),
+          eq(holdings.postId, postId)
+        )
+      )
+      .limit(1);
+
+    if (type === "buy") {
+      if (existingHolding) {
+        // Update existing holding
+        const newAmount = existingHolding.amount + (amount || 0);
+        const newTotalInvested = parseFloat(existingHolding.totalInvested) + (price || 0);
+        const newAverageBuyPrice = newTotalInvested / newAmount;
+
+        await db
+          .update(holdings)
+          .set({
+            amount: newAmount,
+            totalInvested: newTotalInvested.toString(),
+            averageBuyPrice: newAverageBuyPrice.toString(),
+            updatedAt: new Date(),
+          })
+          .where(eq(holdings.id, existingHolding.id));
+
+        console.log(`✅ Updated holding: ${newAmount} tokens`);
+      } else {
+        // Create new holding
+        await db.insert(holdings).values({
+          userId,
+          postId,
+          tokenMintAddress: post.tokenMintAddress,
+          amount: amount || 0,
+          averageBuyPrice: (price / (amount || 1)).toString(),
+          totalInvested: price.toString(),
+          totalRealized: "0",
+        });
+
+        console.log(`✅ Created new holding: ${amount} tokens`);
+      }
+    } else if (type === "sell" && existingHolding) {
+      // Update holding for sell
+      const newAmount = existingHolding.amount - (amount || 0);
+      const newTotalRealized = parseFloat(existingHolding.totalRealized) + (price || 0);
+
+      if (newAmount > 0) {
+        await db
+          .update(holdings)
+          .set({
+            amount: newAmount,
+            totalRealized: newTotalRealized.toString(),
+            updatedAt: new Date(),
+          })
+          .where(eq(holdings.id, existingHolding.id));
+
+        console.log(`✅ Updated holding: ${newAmount} tokens remaining`);
+      } else {
+        // Sold all tokens, delete holding
+        await db
+          .delete(holdings)
+          .where(eq(holdings.id, existingHolding.id));
+
+        console.log(`✅ Holding closed (all tokens sold)`);
+      }
+    }
 
     res.json({
       success: true,
-      message: "Transaction confirmed",
+      message: "Transaction confirmed and holdings updated",
       signature,
     });
   } catch (error: any) {

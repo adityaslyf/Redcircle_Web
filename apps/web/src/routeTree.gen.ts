@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SigninRouteImport } from './routes/signin'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as LaunchRouteImport } from './routes/launch'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LaunchRoute = LaunchRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/feed': typeof FeedRoute
   '/launch': typeof LaunchRoute
+  '/portfolio': typeof PortfolioRoute
   '/signin': typeof SigninRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/feed': typeof FeedRoute
   '/launch': typeof LaunchRoute
+  '/portfolio': typeof PortfolioRoute
   '/signin': typeof SigninRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,22 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/feed': typeof FeedRoute
   '/launch': typeof LaunchRoute
+  '/portfolio': typeof PortfolioRoute
   '/signin': typeof SigninRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/feed' | '/launch' | '/signin'
+  fullPaths: '/' | '/dashboard' | '/feed' | '/launch' | '/portfolio' | '/signin'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/feed' | '/launch' | '/signin'
-  id: '__root__' | '/' | '/dashboard' | '/feed' | '/launch' | '/signin'
+  to: '/' | '/dashboard' | '/feed' | '/launch' | '/portfolio' | '/signin'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/feed'
+    | '/launch'
+    | '/portfolio'
+    | '/signin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +92,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FeedRoute: typeof FeedRoute
   LaunchRoute: typeof LaunchRoute
+  PortfolioRoute: typeof PortfolioRoute
   SigninRoute: typeof SigninRoute
 }
 
@@ -86,6 +103,13 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin'
       preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/launch': {
@@ -124,6 +148,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FeedRoute: FeedRoute,
   LaunchRoute: LaunchRoute,
+  PortfolioRoute: PortfolioRoute,
   SigninRoute: SigninRoute,
 }
 export const routeTree = rootRouteImport

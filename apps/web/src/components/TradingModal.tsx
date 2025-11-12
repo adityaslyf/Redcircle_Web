@@ -200,6 +200,8 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
           signature,
           postId: post.id,
           type: tradeType,
+          amount: tradePreview.tokenAmount,
+          price: tradePreview.finalTotal,
         }),
       });
 

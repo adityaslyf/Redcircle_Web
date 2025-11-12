@@ -64,6 +64,11 @@ export default function Navbar() {
 					ariaLabel: "Open dashboard",
 				},
 				{
+					label: "Portfolio",
+					link: "/portfolio",
+					ariaLabel: "View your portfolio",
+				},
+				{
 					label: "Launch",
 					link: "/launch",
 					ariaLabel: "Launch a post",

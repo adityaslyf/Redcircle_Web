@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "@/contexts/AuthContext";
 import RedditFeed from "@/components/RedditFeed";
@@ -7,11 +7,12 @@ import Leaderboard from "../components/Leaderboard";
 import ProfilePanel from "../components/ProfilePanel";
 import LaunchPanel from "../components/LaunchPanel";
 
-type TabKey = "feed" | "leaderboard" | "launch" | "profile";
+type TabKey = "feed" | "leaderboard" | "portfolio" | "launch" | "profile";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "feed", label: "Feed" },
   { key: "leaderboard", label: "Leaderboard" },
+  { key: "portfolio", label: "Portfolio" },
   { key: "launch", label: "Launch" },
   { key: "profile", label: "Profile" },
 ];
@@ -59,6 +60,25 @@ function DashboardPage() {
         <h2 className="mb-2 pl-1 text-xs uppercase tracking-wider text-white/50">Dashboard</h2>
         {TABS.map((t) => {
           const isActive = active === t.key;
+          
+          // Portfolio gets a direct link to its route
+          if (t.key === "portfolio") {
+            return (
+              <Link
+                key={t.key}
+                to="/portfolio"
+                className={
+                  "rounded-xl border px-3 py-2 text-sm text-center transition-colors " +
+                  (isActive
+                    ? "border-white/20 bg-white/15 text-white"
+                    : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10")
+                }
+              >
+                {t.label}
+              </Link>
+            );
+          }
+          
           return (
             <button
               key={t.key}
