@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion } from "motion/react";
 import FeedCard, { type FeedPost } from "@/components/FeedCard";
+import { getApiUrl } from "@/lib/auth";
 
 const MOCK_POSTS: FeedPost[] = [
   {
@@ -156,9 +157,83 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "terminal", label: "Terminal" },
 ];
 
+// Backend post type (matches database schema)
+type BackendPost = {
+  id: string;
+  title: string;
+  subreddit: string;
+  author: string;
+  upvotes: number;
+  comments: number;
+  tokenizedAt: string;
+  redditCreatedAt?: string;
+  thumbnail?: string; // Database field name
+  tags?: string[];
+  currentPrice?: string;
+  marketCap?: string;
+  totalVolume?: string; // Database field name
+  featured: number;
+};
+
 export default function RedditFeed({ sideFilters = false }: { sideFilters?: boolean }) {
   const [active, setActive] = useState<TabKey>("all");
-  const posts = useMemo(() => MOCK_POSTS, []);
+  const [posts, setPosts] = useState<FeedPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch posts from backend
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const apiUrl = getApiUrl();
+        // Fetch all posts including pending ones (status=all)
+        const response = await fetch(`${apiUrl}/api/posts?status=all&limit=100`);
+        
+        if (!response.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+        
+        const data = await response.json();
+        
+        console.log("📦 Fetched posts from backend:", data.posts?.length || 0);
+        if (data.posts?.length > 0) {
+          console.log("📝 First post:", data.posts[0]);
+        }
+        
+        // Transform backend data to FeedPost format
+        const transformedPosts: FeedPost[] = (data.posts || []).map((post: BackendPost) => ({
+          id: post.id,
+          title: post.title,
+          subreddit: post.subreddit,
+          author: post.author,
+          upvotes: post.upvotes || 0,
+          comments: post.comments || 0,
+          createdAt: post.tokenizedAt,
+          imageUrl: post.thumbnail || undefined,
+          flair: post.tags && post.tags.length > 0 ? post.tags[0] : undefined,
+          tokenPrice: post.currentPrice ? parseFloat(post.currentPrice) : undefined,
+          marketCap: post.marketCap ? parseFloat(post.marketCap) : undefined,
+          volume24h: post.totalVolume ? parseFloat(post.totalVolume) : undefined,
+          isTrending: post.featured > 0,
+        }));
+        
+        console.log("✅ Transformed posts:", transformedPosts.length);
+        setPosts(transformedPosts);
+      } catch (err) {
+        console.error("Error fetching posts:", err);
+        setError(err instanceof Error ? err.message : "Failed to load posts");
+        // Fallback to mock data if API fails
+        setPosts(MOCK_POSTS);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPosts();
+  }, []);
 
   const filtered = useMemo(() => {
     switch (active) {
@@ -242,12 +317,44 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         </div>
       )}
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((post) => (
-          <FeedCard key={post.id} post={post} />
-        ))}
-      </div>
+      {/* Loading State */}
+      {loading && (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="h-96 animate-pulse rounded-3xl border border-white/10 bg-white/5"
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !loading && (
+        <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-8 text-center">
+          <p className="text-red-400">⚠️ {error}</p>
+          <p className="mt-2 text-sm text-white/50">Showing mock data for now</p>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && posts.length === 0 && (
+        <div className="rounded-3xl border border-white/10 bg-white/5 p-12 text-center">
+          <p className="text-xl text-white/70">📭 No tokenized posts yet</p>
+          <p className="mt-2 text-sm text-white/50">
+            Be the first to tokenize a Reddit post!
+          </p>
+        </div>
+      )}
+
+      {/* Posts Grid */}
+      {!loading && filtered.length > 0 && (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((post) => (
+            <FeedCard key={post.id} post={post} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
