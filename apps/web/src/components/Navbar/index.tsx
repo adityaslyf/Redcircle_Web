@@ -1,6 +1,7 @@
 import { StaggeredMenu } from "../StaggeredMenu";
 import { useAuth } from "../../contexts/AuthContext";
 import UserProfile from "../UserProfile";
+import WalletButton from "../WalletButton";
 
 const items = [
 	{
@@ -95,7 +96,7 @@ export default function Navbar() {
 				displaySocials={true}
 				displayItemNumbering={true}
 				logoComponent={
-					<div className="flex items-center justify-between w-full gap-4">
+					<div className="flex items-center justify-between w-full gap-3">
 						<span
 							style={{
 								fontWeight: 800,
@@ -106,7 +107,10 @@ export default function Navbar() {
 						>
 							Redcircle
 						</span>
-						{isAuthenticated && <UserProfile />}
+						<div className="flex items-center gap-3">
+							<WalletButton />
+							{isAuthenticated && <UserProfile />}
+						</div>
 					</div>
 				}
 				menuButtonColor="#ffffff"

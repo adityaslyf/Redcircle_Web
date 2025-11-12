@@ -2,6 +2,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { WalletContextProvider } from "@/contexts/WalletContext";
 import {
 	HeadContent,
 	Outlet,
@@ -44,11 +45,13 @@ function RootComponent() {
 				disableTransitionOnChange
 				storageKey="vite-ui-theme"
 			>
-				<AuthProvider>
-					<Navbar />
-					<Outlet />
-					<Toaster richColors />
-				</AuthProvider>
+				<WalletContextProvider>
+					<AuthProvider>
+						<Navbar />
+						<Outlet />
+						<Toaster richColors />
+					</AuthProvider>
+				</WalletContextProvider>
 			</ThemeProvider>
 			<TanStackRouterDevtools position="bottom-left" />
 		</>

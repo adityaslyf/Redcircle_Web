@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, TrendingUp, TrendingDown, Wallet, ArrowRightLeft } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { FeedPost } from "@/components/FeedCard";
@@ -15,6 +17,8 @@ type TradingModalProps = {
 };
 
 export default function TradingModal({ post, isOpen, onClose }: TradingModalProps) {
+  const { connected, publicKey } = useWallet();
+  const { setVisible } = useWalletModal();
   const [tradeType, setTradeType] = useState<TradeType>("buy");
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,7 +42,16 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
     };
   }, [amount, post.tokenPrice]);
 
+  const handleConnectWallet = () => {
+    setVisible(true);
+  };
+
   const handleTrade = async () => {
+    if (!connected) {
+      handleConnectWallet();
+      return;
+    }
+
     if (!amount || parseFloat(amount) <= 0) {
       alert("Please enter a valid amount");
       return;
@@ -48,13 +61,21 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
     
     try {
       // TODO: Implement actual trading logic with Solana blockchain
+      // This would involve:
+      // 1. Create transaction to interact with token program
+      // 2. Sign transaction with wallet
+      // 3. Send transaction to Solana network
+      // 4. Wait for confirmation
+      // 5. Update backend with trade details
+      
       await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
       
       alert(
         `🎉 ${tradeType === "buy" ? "Purchase" : "Sale"} Successful!\n\n` +
         `${tradePreview.tokenAmount} tokens ${tradeType === "buy" ? "bought" : "sold"}\n` +
-        `Total: ${tradePreview.finalTotal.toFixed(4)} SOL\n\n` +
-        `Note: This is a demo. Actual trading requires Solana wallet integration.`
+        `Total: ${tradePreview.finalTotal.toFixed(4)} SOL\n` +
+        `Wallet: ${publicKey?.toBase58().slice(0, 8)}...\n\n` +
+        `Note: This is a demo. Actual blockchain transaction coming soon.`
       );
       
       onClose();
@@ -246,12 +267,22 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
                 )}
 
                 {/* Wallet Info Banner */}
-                <div className="mb-6 flex items-center gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3">
-                  <Wallet className="h-5 w-5 text-yellow-400" />
-                  <div className="flex-1 text-xs text-white/70">
-                    <span className="font-medium text-yellow-400">Wallet not connected.</span> Trading requires Solana wallet integration (coming soon).
+                {connected ? (
+                  <div className="mb-6 flex items-center gap-3 rounded-xl border border-green-500/20 bg-green-500/5 p-3">
+                    <Wallet className="h-5 w-5 text-green-400" />
+                    <div className="flex-1 text-xs text-white/70">
+                      <span className="font-medium text-green-400">Wallet connected:</span>{" "}
+                      {publicKey?.toBase58().slice(0, 4)}...{publicKey?.toBase58().slice(-4)}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="mb-6 flex items-center gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3">
+                    <Wallet className="h-5 w-5 text-yellow-400" />
+                    <div className="flex-1 text-xs text-white/70">
+                      <span className="font-medium text-yellow-400">Wallet not connected.</span> Click the button below to connect.
+                    </div>
+                  </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex gap-3">
@@ -264,16 +295,20 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
                   </Button>
                   <Button
                     onClick={handleTrade}
-                    disabled={!amount || parseFloat(amount) <= 0 || isSubmitting}
+                    disabled={(!connected && !isSubmitting) || (connected && (!amount || parseFloat(amount) <= 0 || isSubmitting))}
                     className={cn(
                       "flex-1 rounded-xl font-semibold text-white shadow-lg",
-                      tradeType === "buy"
+                      !connected
+                        ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 shadow-purple-500/30"
+                        : tradeType === "buy"
                         ? "bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 shadow-green-500/30"
                         : "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 shadow-red-500/30"
                     )}
                   >
                     {isSubmitting ? (
                       <>Processing...</>
+                    ) : !connected ? (
+                      <>Connect Wallet</>
                     ) : (
                       <>
                         {tradeType === "buy" ? "Buy" : "Sell"} Tokens
