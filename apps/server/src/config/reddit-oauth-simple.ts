@@ -8,11 +8,23 @@ const { users } = schema;
 
 const router = Router();
 
-// Reddit OAuth config
-const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID!;
-const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET!;
-const REDDIT_REDIRECT_URI = process.env.REDDIT_REDIRECT_URI || "http://localhost:3000/auth/reddit/callback";
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3001";
+// Reddit OAuth config - All values MUST come from environment variables
+const REDDIT_CLIENT_ID = process.env.REDDIT_CLIENT_ID;
+const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET;
+const REDDIT_REDIRECT_URI = process.env.REDDIT_REDIRECT_URI;
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
+// Validate required environment variables
+if (!REDDIT_CLIENT_ID || !REDDIT_CLIENT_SECRET || !REDDIT_REDIRECT_URI || !FRONTEND_URL) {
+  throw new Error(
+    '❌ Missing required environment variables:\n' +
+    (!REDDIT_CLIENT_ID ? '  - REDDIT_CLIENT_ID\n' : '') +
+    (!REDDIT_CLIENT_SECRET ? '  - REDDIT_CLIENT_SECRET\n' : '') +
+    (!REDDIT_REDIRECT_URI ? '  - REDDIT_REDIRECT_URI\n' : '') +
+    (!FRONTEND_URL ? '  - FRONTEND_URL\n' : '') +
+    'Please check your .env file.'
+  );
+}
 
 // Step 1: Redirect to Reddit
 router.get("/auth/reddit", (_req, res) => {
@@ -89,9 +101,14 @@ router.get("/auth/reddit/callback", async (req, res) => {
     }
 
     // Generate JWT token
+    const JWT_SECRET = process.env.JWT_SECRET;
+    if (!JWT_SECRET) {
+      throw new Error('❌ JWT_SECRET is not set in environment variables');
+    }
+    
     const token = jwt.sign(
       { userId: user.id },
-      process.env.JWT_SECRET || "your-secret-key",
+      JWT_SECRET,
       { expiresIn: "7d" }
     );
 

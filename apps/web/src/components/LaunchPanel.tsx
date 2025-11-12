@@ -114,13 +114,22 @@ export default function LaunchPanel() {
       }
 
       if (data.success && data.post) {
+        const blockchainInfo = data.blockchain 
+          ? `\n\n🔗 Blockchain Details:\n` +
+            `Mint Address: ${data.blockchain.mintAddress}\n` +
+            `Transaction: ${data.blockchain.transactionSignature.substring(0, 8)}...\n` +
+            `\n📊 View on Solscan: ${data.blockchain.explorerUrl}`
+          : '';
+
         alert(
-          `✅ Post Tokenized Successfully!\n\n` +
+          `🎉 Token Minted on Solana!\n\n` +
+          `✅ ${data.message}\n\n` +
           `Token Symbol: ${data.post.tokenSymbol}\n` +
           `Supply: ${initialSupply} tokens\n` +
           `Initial Price: ${initialPrice} SOL\n` +
-          `Market Cap: ${data.post.marketCap} SOL\n\n` +
-          `Your post is now live for trading!`
+          `Market Cap: ${data.post.marketCap} SOL\n` +
+          `Status: ${data.post.status}` +
+          blockchainInfo
         );
         
         // Reset form
@@ -369,7 +378,7 @@ export default function LaunchPanel() {
             <Button
               type="submit"
               disabled={isSubmitting}
-                className="rounded-2xl border border-purple-500/50 bg-gradient-to-r from-purple-500/20 to-blue-500/20 px-8 py-6 text-white font-semibold hover:from-purple-500/30 hover:to-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20"
+                className="rounded-2xl border border-purple-500/50 bg-gradient-to-r from-purple-500/20 to-blue-500/20 px-8 py-6 text-white font-semibold hover:from-purple-500/30 hover:to-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20 z-10000 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

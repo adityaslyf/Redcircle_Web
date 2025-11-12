@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { RedditService } from "../services/reddit.service";
+import { createPostToken } from "../services/token.service";
 import { db } from "@Redcircle/db";
 import * as schema from "@Redcircle/db";
 import { eq, desc } from "drizzle-orm";
@@ -137,7 +138,31 @@ router.post("/tokenize", async (req, res) => {
     // Generate token symbol (e.g., "POST123")
     const tokenSymbol = `POST${redditPost.id.toUpperCase().substring(0, 6)}`;
 
-    // Create post record
+    // === BLOCKCHAIN: Create actual SPL token on Solana ===
+    console.log("\n🚀 Creating SPL token on Solana blockchain...");
+    let tokenMintData;
+    try {
+      tokenMintData = await createPostToken({
+        postId: redditPost.id,
+        tokenSymbol,
+        tokenSupply: parseInt(tokenSupply.toString()),
+        decimals: 9, // Standard SPL token decimals
+      });
+      
+      console.log("✅ Token successfully minted on blockchain!");
+      console.log(`   Mint Address: ${tokenMintData.mintAddress}`);
+      console.log(`   Explorer: ${tokenMintData.explorerUrl}`);
+    } catch (mintError) {
+      console.error("❌ Failed to mint token on blockchain:", mintError);
+      
+      return res.status(500).json({
+        error: "Failed to mint token on blockchain",
+        details: mintError instanceof Error ? mintError.message : "Unknown error",
+        hint: "Check backend logs for details. Ensure SOLANA_AUTHORITY_PRIVATE_KEY is set and has sufficient SOL."
+      });
+    }
+
+    // Create post record with blockchain data
     const [newPost] = await db
       .insert(posts)
       .values({
@@ -156,11 +181,12 @@ router.post("/tokenize", async (req, res) => {
         currentPrice: initialPrice.toString(),
         description: description || null,
         tokenSymbol,
-        tokenDecimals: 9, // Standard SPL token decimals
-        status: "pending", // Will be updated to "minting" when blockchain integration is added
+        tokenDecimals: tokenMintData.decimals,
+        tokenMintAddress: tokenMintData.mintAddress, // ← Blockchain address
+        status: "active", // ← Token is minted and active!
         totalVolume: "0",
         marketCap,
-        holders: 0,
+        holders: 1, // Authority wallet holds initial supply
         creatorId: userId,
         creatorRewards: "0",
         tags: redditPost.subreddit ? [redditPost.subreddit] : [],
@@ -172,8 +198,13 @@ router.post("/tokenize", async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "Post tokenized successfully",
+      message: "Post tokenized successfully on Solana blockchain",
       post: newPost,
+      blockchain: {
+        mintAddress: tokenMintData.mintAddress,
+        explorerUrl: tokenMintData.explorerUrl,
+        transactionSignature: tokenMintData.signature,
+      },
     });
   } catch (error) {
     console.error("❌ Error tokenizing post:", error);

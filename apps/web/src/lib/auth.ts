@@ -56,7 +56,19 @@ export function logout(): void {
 
 // Get API URL
 export function getApiUrl(): string {
-  return import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const apiUrl = import.meta.env.VITE_API_URL;
+  
+  // In development, use localhost if not set
+  if (!apiUrl && import.meta.env.DEV) {
+    return "http://localhost:3000";
+  }
+  
+  if (!apiUrl) {
+    console.error('❌ VITE_API_URL is not set in environment variables');
+    throw new Error('API URL not configured. Please set VITE_API_URL in .env');
+  }
+  
+  return apiUrl;
 }
 
 // Fetch with auth token

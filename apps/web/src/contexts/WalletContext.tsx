@@ -17,11 +17,14 @@ type WalletContextProviderProps = {
 };
 
 export function WalletContextProvider({ children }: WalletContextProviderProps) {
-  // You can use 'devnet', 'testnet', or 'mainnet-beta'
-  const network = "devnet"; // Change to 'mainnet-beta' for production
+  // Get network from environment variable, default to devnet
+  const network = (import.meta.env.VITE_SOLANA_NETWORK || "devnet") as "devnet" | "testnet" | "mainnet-beta";
   
-  // You can also provide a custom RPC endpoint
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  // Use custom RPC endpoint if provided, otherwise use cluster API URL
+  const endpoint = useMemo(() => {
+    const customRpc = import.meta.env.VITE_SOLANA_RPC_URL;
+    return customRpc || clusterApiUrl(network);
+  }, [network]);
 
   // Initialize wallet adapters
   const wallets = useMemo(

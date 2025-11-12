@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@Redcircle/db": "workspace:*",
+    "@solana/spl-token": "0.4.9",
+    "@solana/web3.js": "1.95.8",
+    "bs58": "5.0.0",
     "cors": "^2.8.5",
     "dotenv": "catalog:",
     "drizzle-orm": "^0.44.2",

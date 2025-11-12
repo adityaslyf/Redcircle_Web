@@ -79,7 +79,7 @@ function SignIn() {
     const password = formData.get("password");
     const rememberMe = formData.get("rememberMe");
 
-    console.log("Email/Password sign in:", { email, password, rememberMe });
+    console.log("Email/Password sign in attempt:", { email, rememberMe, hasPassword: !!password });
     
     // TODO: Implement email/password authentication
     alert("Email/password authentication is not yet implemented. Please use Reddit sign-in.");
