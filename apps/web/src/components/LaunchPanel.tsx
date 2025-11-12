@@ -3,15 +3,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { TrendingUp, Coins, Users, Sparkles, ExternalLink, AlertCircle } from "lucide-react";
+import { getApiUrl } from "@/lib/auth";
 
 interface RedditPostPreview {
+  redditPostId: string;
   title: string;
   author: string;
   subreddit: string;
   upvotes: number;
   comments: number;
   thumbnail?: string;
-  created: number;
+  url: string;
+  content?: string;
+  createdAt: string;
+  age: string;
 }
 
 export default function LaunchPanel() {
@@ -28,19 +33,6 @@ export default function LaunchPanel() {
   
   const [isSubmitting, setSubmitting] = useState(false);
 
-  const extractRedditPostId = (url: string): string | null => {
-    const patterns = [
-      /reddit\.com\/r\/[^/]+\/comments\/([a-z0-9]+)/i,
-      /redd\.it\/([a-z0-9]+)/i,
-    ];
-    
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-    return null;
-  };
-
   const handleFetchPost = async () => {
     if (!url) return;
     
@@ -48,27 +40,32 @@ export default function LaunchPanel() {
     setIsFetching(true);
     
     try {
-      const postId = extractRedditPostId(url);
-      if (!postId) {
-        throw new Error("Invalid Reddit URL. Please use a valid post URL.");
+      const apiUrl = getApiUrl();
+      console.log("🔍 Fetching post from:", `${apiUrl}/api/posts/fetch-reddit`);
+      
+      const response = await fetch(`${apiUrl}/api/posts/fetch-reddit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch Reddit post");
       }
 
-      // Mock fetch for now - will be replaced with actual Reddit API call
-      await new Promise((r) => setTimeout(r, 1000));
+      if (data.success && data.post) {
+        setPostPreview(data.post);
+        console.log("✅ Post fetched successfully:", data.post.title);
+      } else {
+        throw new Error("Invalid response from server");
+      }
       
-      // Mock data - in production this will come from Reddit API
-      setPostPreview({
-        title: "This is a sample Reddit post title that will be tokenized",
-        author: "u/sample_user",
-        subreddit: "r/CryptoCurrency",
-        upvotes: 1234,
-        comments: 89,
-        created: Date.now() - 3600000,
-        thumbnail: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&q=80",
-      });
-      
-      setDescription(""); // Auto-generate description later
     } catch (err) {
+      console.error("❌ Error fetching post:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch post");
       setPostPreview(null);
     } finally {
@@ -83,33 +80,60 @@ export default function LaunchPanel() {
       setError("Please fetch post details first");
       return;
     }
+
+    if (!user?.id) {
+      setError("You must be signed in to tokenize posts");
+      return;
+    }
     
     setSubmitting(true);
     setError("");
     
     try {
-      // Placeholder: wire to backend later
-      await new Promise((r) => setTimeout(r, 1500));
+      const apiUrl = getApiUrl();
+      console.log("🪙 Tokenizing post:", postPreview.title);
       
-      console.log("Tokenizing post:", {
-        url,
-        postPreview,
-        initialSupply,
-        initialPrice,
-        description,
-        submittedBy: user?.username,
+      const response = await fetch(`${apiUrl}/api/posts/tokenize`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url,
+          tokenSupply: parseInt(initialSupply),
+          initialPrice: parseFloat(initialPrice),
+          description: description || null,
+          userId: user.id,
+        }),
       });
-      
-      alert(`✅ Post tokenized successfully!\n\nToken Supply: ${initialSupply}\nInitial Price: ${initialPrice} SOL\n\nYour post is now live for trading.`);
-      
-      // Reset form
-      setUrl("");
-      setPostPreview(null);
-      setInitialSupply("10000");
-      setInitialPrice("0.001");
-      setDescription("");
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to tokenize post");
+      }
+
+      if (data.success && data.post) {
+        alert(
+          `✅ Post Tokenized Successfully!\n\n` +
+          `Token Symbol: ${data.post.tokenSymbol}\n` +
+          `Supply: ${initialSupply} tokens\n` +
+          `Initial Price: ${initialPrice} SOL\n` +
+          `Market Cap: ${data.post.marketCap} SOL\n\n` +
+          `Your post is now live for trading!`
+        );
+        
+        // Reset form
+        setUrl("");
+        setPostPreview(null);
+        setInitialSupply("10000");
+        setInitialPrice("0.001");
+        setDescription("");
+      } else {
+        throw new Error("Invalid response from server");
+      }
     } catch (err) {
-      setError("Failed to tokenize post. Please try again.");
+      setError(err instanceof Error ? err.message : "Failed to tokenize post. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -345,7 +369,7 @@ export default function LaunchPanel() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-2xl border border-purple-500/50 bg-gradient-to-r from-purple-500/20 to-blue-500/20 px-8 py-6 text-white font-semibold hover:from-purple-500/30 hover:to-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20 z-10000 cursor-pointer"
+                className="rounded-2xl border border-purple-500/50 bg-gradient-to-r from-purple-500/20 to-blue-500/20 px-8 py-6 text-white font-semibold hover:from-purple-500/30 hover:to-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20"
             >
               {isSubmitting ? (
                 <>
@@ -354,6 +378,7 @@ export default function LaunchPanel() {
                 </>
               ) : (
                 <>
+                  <Sparkles className="w-5 h-5 mr-2" />
                   Launch Token
                 </>
               )}

@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "motion/react";
+import { useAuth } from "@/contexts/AuthContext";
 import RedditFeed from "@/components/RedditFeed";
 import Leaderboard from "../components/Leaderboard";
 import ProfilePanel from "../components/ProfilePanel";
@@ -20,7 +21,36 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
   const [active, setActive] = useState<TabKey>("feed");
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      // Redirect to sign-in if not authenticated
+      navigate({ 
+        to: "/signin",
+        search: { redirect: "/dashboard" }
+      });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center pt-24">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white"></div>
+          <p className="text-white/70">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render dashboard if not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="relative min-h-screen pt-24">

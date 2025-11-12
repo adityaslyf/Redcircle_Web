@@ -168,7 +168,7 @@ router.post("/tokenize", async (req, res) => {
       })
       .returning();
 
-    console.log(`✅ Post tokenized: ${newPost.id} (${newPost.tokenSymbol})`);
+    console.log(`✅ Post tokenized: ${newPost.tokenSymbol} by user ${newPost.creatorId}`);
 
     res.status(201).json({
       success: true,

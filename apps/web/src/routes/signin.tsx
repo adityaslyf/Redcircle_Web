@@ -6,18 +6,24 @@ import { getApiUrl } from "../lib/auth";
 
 export const Route = createFileRoute("/signin")({
   component: SignIn,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      redirect: (search.redirect as string) || undefined,
+    };
+  },
 });
 
 function SignIn() {
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
+  const { redirect } = Route.useSearch();
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate({ to: "/" });
+      navigate({ to: redirect || "/" });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, redirect]);
 
   // Handle OAuth callback
   useEffect(() => {
@@ -57,8 +63,8 @@ function SignIn() {
         // Clean up URL
         window.history.replaceState({}, document.title, "/signin");
         
-        // Redirect to home page
-        navigate({ to: "/" });
+        // Redirect to intended page or home
+        navigate({ to: redirect || "/" });
       } catch (err) {
         console.error("❌ Error parsing user data:", err);
         alert("Failed to complete sign in. Please try again.");
@@ -112,7 +118,11 @@ function SignIn() {
           Welcome to <span className="font-bold font-satoshi">Redcircle</span>
         </span>
       }
-      description="Access your account and start trading tokenized engagement"
+      description={
+        redirect 
+          ? "Please sign in to access this feature"
+          : "Access your account and start trading tokenized engagement"
+      }
       heroImageSrc="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop"
       testimonials={[
         {
