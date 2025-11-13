@@ -5,7 +5,7 @@ import { db } from "@Redcircle/db";
 import * as schema from "@Redcircle/db";
 import { eq, and } from "drizzle-orm";
 
-const { holdings } = schema;
+const { holdings, transactions } = schema;
 
 const router = Router();
 
@@ -120,11 +120,11 @@ router.get("/stats/:postId", async (req, res) => {
 
 /**
  * POST /api/trading/confirm
- * Confirm transaction and update holdings
+ * Confirm transaction and update holdings + record transaction history
  */
 router.post("/confirm", authenticateToken, async (req, res) => {
   try {
-    const { signature, postId, type, amount, price } = req.body;
+    const { signature, postId, type, amount, price, walletAddress } = req.body;
     const userId = (req as any).userId;
 
     console.log(`\n✅ Transaction confirmed: ${signature}`);
@@ -142,6 +142,27 @@ router.post("/confirm", authenticateToken, async (req, res) => {
     if (!post || !post.tokenMintAddress) {
       throw new Error("Post or token mint not found");
     }
+
+    // Calculate price per token
+    const pricePerToken = price / (amount || 1);
+
+    // Record transaction in history
+    await db.insert(transactions).values({
+      userId,
+      postId,
+      type,
+      amount: amount || 0,
+      pricePerToken: pricePerToken.toString(),
+      totalValue: price.toString(),
+      signature,
+      tokenMintAddress: post.tokenMintAddress,
+      walletAddress: walletAddress || '',
+      networkFee: "0.000005", // Estimated Solana fee
+      platformFee: "0",
+      status: "confirmed",
+    });
+
+    console.log(`✅ Transaction recorded in history`);
 
     // Get or create user holding
     const [existingHolding] = await db

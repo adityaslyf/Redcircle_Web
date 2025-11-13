@@ -5,6 +5,7 @@ import redditAuthRoutes from "./config/reddit-oauth-simple";
 import postsRoutes from "./routes/posts";
 import tradingRoutes from "./routes/trading";
 import portfolioRoutes from "./routes/portfolio";
+import transactionsRoutes from "./routes/transactions";
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(redditAuthRoutes);
 app.use("/api/posts", postsRoutes);
 app.use("/api/trading", tradingRoutes);
 app.use("/api/portfolio", portfolioRoutes);
+app.use("/api/transactions", transactionsRoutes);
 
 app.get("/", (_req, res) => {
 	res.status(200).json({ message: "RedCircle API is running" });
