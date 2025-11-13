@@ -9,13 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SigninRouteImport } from './routes/signin'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as LaunchRouteImport } from './routes/launch'
 import { Route as FeedRouteImport } from './routes/feed'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TokenTokenIdRouteImport } from './routes/token.$tokenId'
 
+const TransactionsRoute = TransactionsRouteImport.update({
+  id: '/transactions',
+  path: '/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
@@ -46,6 +53,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TokenTokenIdRoute = TokenTokenIdRouteImport.update({
+  id: '/token/$tokenId',
+  path: '/token/$tokenId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +66,8 @@ export interface FileRoutesByFullPath {
   '/launch': typeof LaunchRoute
   '/portfolio': typeof PortfolioRoute
   '/signin': typeof SigninRoute
+  '/transactions': typeof TransactionsRoute
+  '/token/$tokenId': typeof TokenTokenIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +76,8 @@ export interface FileRoutesByTo {
   '/launch': typeof LaunchRoute
   '/portfolio': typeof PortfolioRoute
   '/signin': typeof SigninRoute
+  '/transactions': typeof TransactionsRoute
+  '/token/$tokenId': typeof TokenTokenIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,12 +87,30 @@ export interface FileRoutesById {
   '/launch': typeof LaunchRoute
   '/portfolio': typeof PortfolioRoute
   '/signin': typeof SigninRoute
+  '/transactions': typeof TransactionsRoute
+  '/token/$tokenId': typeof TokenTokenIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/feed' | '/launch' | '/portfolio' | '/signin'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/feed'
+    | '/launch'
+    | '/portfolio'
+    | '/signin'
+    | '/transactions'
+    | '/token/$tokenId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/feed' | '/launch' | '/portfolio' | '/signin'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/feed'
+    | '/launch'
+    | '/portfolio'
+    | '/signin'
+    | '/transactions'
+    | '/token/$tokenId'
   id:
     | '__root__'
     | '/'
@@ -85,6 +119,8 @@ export interface FileRouteTypes {
     | '/launch'
     | '/portfolio'
     | '/signin'
+    | '/transactions'
+    | '/token/$tokenId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,10 +130,19 @@ export interface RootRouteChildren {
   LaunchRoute: typeof LaunchRoute
   PortfolioRoute: typeof PortfolioRoute
   SigninRoute: typeof SigninRoute
+  TransactionsRoute: typeof TransactionsRoute
+  TokenTokenIdRoute: typeof TokenTokenIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/transactions': {
+      id: '/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signin': {
       id: '/signin'
       path: '/signin'
@@ -140,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/token/$tokenId': {
+      id: '/token/$tokenId'
+      path: '/token/$tokenId'
+      fullPath: '/token/$tokenId'
+      preLoaderRoute: typeof TokenTokenIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -150,6 +202,8 @@ const rootRouteChildren: RootRouteChildren = {
   LaunchRoute: LaunchRoute,
   PortfolioRoute: PortfolioRoute,
   SigninRoute: SigninRoute,
+  TransactionsRoute: TransactionsRoute,
+  TokenTokenIdRoute: TokenTokenIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

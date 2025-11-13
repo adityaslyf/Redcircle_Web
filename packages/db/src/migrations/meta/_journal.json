@@ -15,6 +15,13 @@
       "when": 1762982450649,
       "tag": "0001_petite_epoch",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762985124015,
+      "tag": "0002_open_gressill",
+      "breakpoints": true
     }
   ]
 }

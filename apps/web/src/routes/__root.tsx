@@ -10,6 +10,10 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import "../index.css";
+import { Buffer } from 'buffer';
+
+
+window.Buffer = Buffer;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface RouterAppContext {}

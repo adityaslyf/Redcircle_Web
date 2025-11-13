@@ -69,6 +69,11 @@ export default function Navbar() {
 					ariaLabel: "View your portfolio",
 				},
 				{
+					label: "Transactions",
+					link: "/transactions",
+					ariaLabel: "View transaction history",
+				},
+				{
 					label: "Launch",
 					link: "/launch",
 					ariaLabel: "Launch a post",

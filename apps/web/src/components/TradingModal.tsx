@@ -9,8 +9,11 @@ import { Input } from "@/components/ui/input";
 import type { FeedPost } from "@/components/FeedCard";
 import { cn } from "@/lib/utils";
 import { fetchWithAuth, getApiUrl } from "@/lib/auth";
+import { Buffer } from 'buffer';
 
 type TradeType = "buy" | "sell";
+// @ts-ignore
+window.Buffer = Buffer;
 
 type TradingModalProps = {
   post: FeedPost;

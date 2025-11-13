@@ -7,12 +7,13 @@ import Leaderboard from "../components/Leaderboard";
 import ProfilePanel from "../components/ProfilePanel";
 import LaunchPanel from "../components/LaunchPanel";
 
-type TabKey = "feed" | "leaderboard" | "portfolio" | "launch" | "profile";
+type TabKey = "feed" | "leaderboard" | "portfolio" | "transactions" | "launch" | "profile";
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: "feed", label: "Feed" },
   { key: "leaderboard", label: "Leaderboard" },
   { key: "portfolio", label: "Portfolio" },
+  { key: "transactions", label: "Transactions" },
   { key: "launch", label: "Launch" },
   { key: "profile", label: "Profile" },
 ];
@@ -61,12 +62,12 @@ function DashboardPage() {
         {TABS.map((t) => {
           const isActive = active === t.key;
           
-          // Portfolio gets a direct link to its route
-          if (t.key === "portfolio") {
+          // Portfolio and Transactions get direct links to their routes
+          if (t.key === "portfolio" || t.key === "transactions") {
             return (
               <Link
                 key={t.key}
-                to="/portfolio"
+                to={t.key === "portfolio" ? "/portfolio" : "/transactions"}
                 className={
                   "rounded-xl border px-3 py-2 text-sm text-center transition-colors " +
                   (isActive

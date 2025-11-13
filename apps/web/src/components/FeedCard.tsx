@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "motion/react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +18,13 @@ export type FeedPost = {
   marketCap?: number; // in SOL
   volume24h?: number; // in SOL
   isTrending?: boolean;
+  tokenSymbol?: string;
+  initialPrice?: string;
+  status?: string;
+  tokenMintAddress?: string;
+  redditUrl?: string;
+  totalSupply?: number;
+  holders?: number;
 };
 
 type FeedCardProps = {
@@ -85,9 +93,15 @@ export default function FeedCard({ post, className, onTrade }: FeedCardProps) {
               <span className="opacity-40">•</span>
               <span>{timeAgo}</span>
             </div>
-            <h3 className="mt-1 line-clamp-2 text-[0.98rem] font-semibold leading-snug text-white">
-              {post.title}
-            </h3>
+            <Link
+              to="/token/$tokenId"
+              params={{ tokenId: post.id }}
+              className="group/link"
+            >
+              <h3 className="mt-1 line-clamp-2 text-[0.98rem] font-semibold leading-snug text-white transition-colors group-hover/link:text-purple-400">
+                {post.title}
+              </h3>
+            </Link>
           </div>
         </div>
 
