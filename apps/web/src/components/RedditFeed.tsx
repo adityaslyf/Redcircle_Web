@@ -6,151 +6,6 @@ import TradingModal from "@/components/TradingModal";
 import { getApiUrl } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 
-const MOCK_POSTS: FeedPost[] = [
-  {
-    id: "1",
-    title: "I built a bot that analyzes sentiment of crypto subreddits in real-time",
-    subreddit: "CryptoCurrency",
-    author: "quantum_builder",
-    upvotes: 18420,
-    comments: 1023,
-    createdAt: new Date(Date.now() - 1000 * 60 * 37).toISOString(),
-    imageUrl:
-      "https://images.unsplash.com/photo-1640340434858-886b2a2e4fcc?q=80&w=1600&auto=format&fit=crop",
-    flair: "Project",
-    tokenPrice: 0.128,
-    marketCap: 425_000,
-    volume24h: 62_310,
-    isTrending: true,
-  },
-  {
-    id: "2",
-    title: "This UI pattern feels so satisfying on mobile",
-    subreddit: "reactjs",
-    author: "uimotion",
-    upvotes: 9320,
-    comments: 404,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-    imageUrl:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1600&auto=format&fit=crop",
-    flair: "Showcase",
-    tokenPrice: 0.072,
-    marketCap: 122_000,
-    volume24h: 18_940,
-  },
-  {
-    id: "3",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-    flair: "Discussion",
-    tokenPrice: 0.054,
-    marketCap: 86_000,
-    volume24h: 9_120,
-  },
-  {
-    id: "4",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-    flair: "Discussion",
-    tokenPrice: 0.054,
-
-    marketCap: 86_000,
-    volume24h: 9_120,
-  },
-  {
-    id: "5",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-    flair: "Discussion",
-    tokenPrice: 0.054,
-    marketCap: 86_000,
-    volume24h: 9_120,
-  },
-  {
-    id: "6",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-    flair: "Discussion",
-    tokenPrice: 0.054,
-    marketCap: 86_000,
-    volume24h: 9_120,
-  },
-  {
-    id: "7",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-    flair: "Discussion",
-    tokenPrice: 0.054,
-    marketCap: 86_000,
-    volume24h: 9_120,
-  },
-  {
-    id: "8",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-  },
-  {
-    id: "9",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-  },
-  {
-    id: "10",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-  },
-  {
-    id: "11",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-  },
-  {
-    id: "12",
-    title: "Ask HN: What made your side project take off?",
-    subreddit: "Entrepreneur",
-    author: "growthloop",
-    upvotes: 14210,
-    comments: 857,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 27).toISOString(),
-  },
-];
-
 type TabKey = "all" | "trending" | "new" | "terminal";
 
 const TABS: { key: TabKey; label: string }[] = [
@@ -231,6 +86,13 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
           marketCap: post.marketCap ? parseFloat(post.marketCap) : undefined,
           volume24h: post.totalVolume ? parseFloat(post.totalVolume) : undefined,
           isTrending: post.featured > 0,
+          tokenSymbol: post.tokenSymbol,
+          initialPrice: post.initialPrice,
+          status: post.status,
+          tokenMintAddress: post.tokenMintAddress,
+          redditUrl: post.redditUrl,
+          totalSupply: post.tokenSupply ? parseFloat(post.tokenSupply) : undefined,
+          holders: post.holders || 0,
         }));
         
         console.log("✅ Transformed posts:", transformedPosts.length);
@@ -249,8 +111,7 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
       } catch (err) {
         console.error("Error fetching posts:", err);
         setError(err instanceof Error ? err.message : "Failed to load posts");
-        // Fallback to mock data if API fails
-        setPosts(MOCK_POSTS);
+        // Don't set posts to empty, keep existing posts on error
       } finally {
         setLoading(false);
         setIsRefreshing(false);
@@ -415,10 +276,15 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
       )}
 
       {/* Error State */}
-      {error && !loading && (
+      {error && !loading && posts.length === 0 && (
         <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-8 text-center">
           <p className="text-red-400">⚠️ {error}</p>
-          <p className="mt-2 text-sm text-white/50">Showing mock data for now</p>
+          <button
+            onClick={handleRefresh}
+            className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-6 py-2 text-sm text-white transition-colors hover:bg-white/10"
+          >
+            Try Again
+          </button>
         </div>
       )}
 

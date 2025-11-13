@@ -35,45 +35,39 @@ export default function PriceChart({
   const isPositive = priceChange >= 0;
 
   useEffect(() => {
-    // Generate sample price data based on bonding curve
-    // In production, this would fetch from your API
-    const generateSampleData = () => {
-      const now = Date.now();
-      const dataPoints: PriceDataPoint[] = [];
-      const numPoints = timeframe === "1H" ? 12 : timeframe === "24H" ? 24 : timeframe === "7D" ? 28 : 50;
-      const timeInterval = 
-        timeframe === "1H" ? 5 * 60 * 1000 : // 5 minutes
-        timeframe === "24H" ? 60 * 60 * 1000 : // 1 hour
-        timeframe === "7D" ? 6 * 60 * 60 * 1000 : // 6 hours
-        24 * 60 * 60 * 1000; // 1 day
+    const fetchPriceHistory = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/price-history/${postId}?timeframe=${timeframe}`,
+          {
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
 
-      for (let i = numPoints; i >= 0; i--) {
-        const timestamp = now - i * timeInterval;
-        // Simulate bonding curve price progression
-        const progress = 1 - i / numPoints;
-        const basePrice = initialPrice + (currentPrice - initialPrice) * progress;
-        // Add some random variation
-        const variance = basePrice * 0.05 * (Math.random() - 0.5);
-        const price = Math.max(initialPrice * 0.8, basePrice + variance);
-        const volume = Math.random() * 100;
-
-        dataPoints.push({
-          timestamp,
-          price,
-          volume,
-        });
+        if (result.success && result.data) {
+          const formattedData = result.data.map((point: any) => ({
+            timestamp: new Date(point.timestamp).getTime(),
+            price: point.price,
+            volume: point.volume,
+          }));
+          setPriceData(formattedData);
+        } else {
+          // Fallback to generating data if API fails or returns no data
+          console.warn("Using synthetic price data");
+          setPriceData([]);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching price history:", error);
+        setPriceData([]);
+      } finally {
+        setLoading(false);
       }
-
-      return dataPoints;
     };
 
-    setLoading(true);
-    // Simulate API call delay
-    setTimeout(() => {
-      setPriceData(generateSampleData());
-      setLoading(false);
-    }, 500);
-  }, [postId, timeframe, initialPrice, currentPrice]);
+    fetchPriceHistory();
+  }, [postId, timeframe]);
 
   const formatXAxis = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -160,6 +154,14 @@ export default function PriceChart({
           <div className="flex flex-col items-center gap-3">
             <Activity className="h-8 w-8 animate-pulse text-white/40" />
             <p className="text-sm text-white/60">Loading chart data...</p>
+          </div>
+        </div>
+      ) : priceData.length === 0 ? (
+        <div className="flex h-64 items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <Activity className="h-8 w-8 text-white/40" />
+            <p className="text-sm text-white/60">No price data available yet</p>
+            <p className="text-xs text-white/40">Data will appear after the first trade</p>
           </div>
         </div>
       ) : (

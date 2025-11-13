@@ -6,6 +6,8 @@ import postsRoutes from "./routes/posts";
 import tradingRoutes from "./routes/trading";
 import portfolioRoutes from "./routes/portfolio";
 import transactionsRoutes from "./routes/transactions";
+import leaderboardRoutes from "./routes/leaderboard";
+import priceHistoryRoutes from "./routes/price-history";
 
 const app = express();
 
@@ -26,6 +28,8 @@ app.use("/api/posts", postsRoutes);
 app.use("/api/trading", tradingRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/transactions", transactionsRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
+app.use("/api/price-history", priceHistoryRoutes);
 
 app.get("/", (_req, res) => {
 	res.status(200).json({ message: "RedCircle API is running" });

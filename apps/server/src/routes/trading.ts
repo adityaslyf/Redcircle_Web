@@ -5,7 +5,7 @@ import { db } from "@Redcircle/db";
 import * as schema from "@Redcircle/db";
 import { eq, and } from "drizzle-orm";
 
-const { holdings, transactions } = schema;
+const { holdings, transactions, priceHistory } = schema;
 
 const router = Router();
 
@@ -163,6 +163,20 @@ router.post("/confirm", authenticateToken, async (req, res) => {
     });
 
     console.log(`✅ Transaction recorded in history`);
+
+    // Record price history
+    try {
+      await db.insert(priceHistory).values({
+        postId,
+        price: pricePerToken.toString(),
+        volume: price.toString(),
+        timestamp: new Date(),
+      });
+      console.log(`✅ Price history recorded`);
+    } catch (priceError) {
+      console.warn(`⚠️ Failed to record price history:`, priceError);
+      // Don't fail the transaction if price history fails
+    }
 
     // Get or create user holding
     const [existingHolding] = await db

@@ -1,9 +1,11 @@
 import { motion } from "motion/react";
-import { useMemo, useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchWithAuth } from "@/lib/auth";
 
 type Category = "author" | "curator";
 
 type Entry = {
+  rank: number;
   id: string;
   user: string;
   avatar?: string;
@@ -12,22 +14,37 @@ type Entry = {
   category: Category;
 };
 
-const MOCK: Entry[] = [
-  { id: "1", user: "quantum_builder", pnl: 182.4, volume: 12420, category: "author" },
-  { id: "2", user: "uimotion", pnl: 141.1, volume: 9820, category: "author" },
-  { id: "3", user: "growthloop", pnl: 119.7, volume: 7442, category: "author" },
-  { id: "4", user: "satoshifan", pnl: 88.2, volume: 5320, category: "author" },
-  { id: "5", user: "alpha_scan", pnl: 72.9, volume: 4981, category: "author" },
-  { id: "6", user: "curation_dao", pnl: 164.2, volume: 15210, category: "curator" },
-  { id: "7", user: "alpha_curator", pnl: 137.5, volume: 10110, category: "curator" },
-  { id: "8", user: "signal_hub", pnl: 106.3, volume: 8422, category: "curator" },
-  { id: "9", user: "vault_xyz", pnl: 93.8, volume: 7301, category: "curator" },
-  { id: "10", user: "trend_maker", pnl: 77.4, volume: 5680, category: "curator" },
-];
-
 export default function Leaderboard({ sideFilters = false }: { sideFilters?: boolean }) {
   const [category, setCategory] = useState<Category>("author");
-  const data = useMemo(() => MOCK.filter((e) => e.category === category), [category]);
+  const [data, setData] = useState<Entry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetchWithAuth(`/api/leaderboard?category=${category}&limit=10`);
+        const result = await response.json();
+
+        if (result.success) {
+          setData(result.data);
+        } else {
+          setError(result.error || "Failed to load leaderboard");
+        }
+      } catch (err) {
+        console.error("❌ Error fetching leaderboard:", err);
+        setError("Failed to load leaderboard");
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, [category]);
 
   return (
     <section className="w-full">
@@ -103,18 +120,39 @@ export default function Leaderboard({ sideFilters = false }: { sideFilters?: boo
           <div className="col-span-3 text-right">PnL</div>
           <div className="col-span-3 text-right">Volume</div>
         </div>
-        <ul className="divide-y divide-white/10">
-          {data.map((e, idx) => (
-            <li key={e.id} className="grid grid-cols-12 items-center bg-black/60 px-4 py-3 backdrop-blur">
-              <div className="col-span-6 truncate text-white/90">
-                <span className="mr-3 inline-block w-5 text-white/40">{idx + 1}</span>
-                u/{e.user}
-              </div>
-              <div className="col-span-3 text-right font-medium text-emerald-400">{e.pnl.toFixed(1)}%</div>
-              <div className="col-span-3 text-right text-white/70">{Intl.NumberFormat().format(e.volume)} SOL</div>
-            </li>
-          ))}
-        </ul>
+        
+        {loading ? (
+          <div className="bg-black/60 px-4 py-12 text-center backdrop-blur">
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-white/20 border-t-white"></div>
+            <p className="mt-3 text-sm text-white/60">Loading leaderboard...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-black/60 px-4 py-12 text-center backdrop-blur">
+            <p className="text-sm text-red-400">⚠️ {error}</p>
+          </div>
+        ) : data.length === 0 ? (
+          <div className="bg-black/60 px-4 py-12 text-center backdrop-blur">
+            <p className="text-sm text-white/60">No data available yet</p>
+            <p className="mt-1 text-xs text-white/40">
+              {category === "author" ? "No tokenized posts yet" : "No trades yet"}
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-white/10">
+            {data.map((e) => (
+              <li key={e.id} className="grid grid-cols-12 items-center bg-black/60 px-4 py-3 backdrop-blur">
+                <div className="col-span-6 truncate text-white/90">
+                  <span className="mr-3 inline-block w-5 text-white/40">{e.rank}</span>
+                  u/{e.user}
+                </div>
+                <div className={`col-span-3 text-right font-medium ${e.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {e.pnl >= 0 ? '+' : ''}{e.pnl.toFixed(1)}%
+                </div>
+                <div className="col-span-3 text-right text-white/70">{Intl.NumberFormat().format(e.volume)} SOL</div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );
