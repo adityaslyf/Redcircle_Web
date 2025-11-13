@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { RefreshCw } from "lucide-react";
 import FeedCard, { type FeedPost } from "@/components/FeedCard";
 import TradingModal from "@/components/TradingModal";
+import SearchBar, { type SearchFilters } from "@/components/SearchBar";
 import { getApiUrl } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 
@@ -44,9 +45,11 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
+  const [isSearching, setIsSearching] = useState(false);
 
   // Fetch posts from backend
-  const fetchPosts = useCallback(async (showRefreshing = false, resetOffset = true) => {
+  const fetchPosts = useCallback(async (showRefreshing = false, resetOffset = true, filters: SearchFilters = {}, currentOffset = 0) => {
       try {
         if (showRefreshing) {
           setIsRefreshing(true);
@@ -55,11 +58,32 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         }
         setError(null);
         
-        const currentOffset = resetOffset ? 0 : offset;
+        const useOffset = resetOffset ? 0 : currentOffset;
         
         const apiUrl = getApiUrl();
-        // Fetch posts with pagination
-        const response = await fetch(`${apiUrl}/api/posts?status=all&limit=20&offset=${currentOffset}`);
+        
+        // Build URL based on whether we're searching or browsing
+        const hasSearchParams = filters.q || filters.subreddit || filters.author || filters.minPrice || filters.maxPrice || filters.minVolume || filters.minMarketCap || filters.tags;
+        let url = hasSearchParams 
+          ? `${apiUrl}/api/posts/search?`
+          : `${apiUrl}/api/posts?status=all&`;
+        
+        // Add pagination
+        url += `limit=20&offset=${useOffset}`;
+        
+        // Add filters
+        if (filters.q) url += `&q=${encodeURIComponent(filters.q)}`;
+        if (filters.subreddit) url += `&subreddit=${encodeURIComponent(filters.subreddit)}`;
+        if (filters.author) url += `&author=${encodeURIComponent(filters.author)}`;
+        if (filters.minPrice) url += `&minPrice=${filters.minPrice}`;
+        if (filters.maxPrice) url += `&maxPrice=${filters.maxPrice}`;
+        if (filters.minVolume) url += `&minVolume=${filters.minVolume}`;
+        if (filters.minMarketCap) url += `&minMarketCap=${filters.minMarketCap}`;
+        if (filters.tags) url += `&tags=${encodeURIComponent(filters.tags)}`;
+        if (filters.sortBy) url += `&sortBy=${filters.sortBy}`;
+        
+        // Fetch posts with filters
+        const response = await fetch(url);
         
         if (!response.ok) {
           throw new Error("Failed to fetch posts");
@@ -116,7 +140,7 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         setLoading(false);
         setIsRefreshing(false);
       }
-    }, [offset]);
+    }, []); // Remove offset from dependencies
 
   // Load more posts
   const loadMorePosts = useCallback(async () => {
@@ -124,21 +148,30 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
     
     setLoadingMore(true);
     try {
-      await fetchPosts(false, false);
+      await fetchPosts(false, false, searchFilters, offset);
     } finally {
       setLoadingMore(false);
     }
-  }, [loadingMore, hasMore, fetchPosts]);
+  }, [loadingMore, hasMore, fetchPosts, searchFilters, offset]);
+
+  // Handle search
+  const handleSearch = useCallback((filters: SearchFilters) => {
+    setSearchFilters(filters);
+    setIsSearching(Object.keys(filters).length > 0);
+    setOffset(0);
+    fetchPosts(false, true, filters, 0);
+  }, [fetchPosts]);
 
   // Initial fetch
   useEffect(() => {
-    fetchPosts(true, true);
+    fetchPosts(true, true, {}, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle manual refresh
   const handleRefresh = () => {
-    fetchPosts(true, true);
+    setOffset(0);
+    fetchPosts(true, true, searchFilters, 0);
   };
 
   // Infinite scroll effect
@@ -182,6 +215,11 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
   return (
     <>
       <section id="feed" className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+      {/* Search Bar */}
+      <div className="mb-8">
+        <SearchBar onSearch={handleSearch} showFilters={true} />
+      </div>
+
       {sideFilters ? (
         <aside className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 sm:flex">
           <h3 className="mb-2 pl-1 text-xs uppercase tracking-wider text-white/50">Feed</h3>
