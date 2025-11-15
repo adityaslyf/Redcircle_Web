@@ -57,7 +57,7 @@ function RootComponent() {
 					</AuthProvider>
 				</WalletContextProvider>
 			</ThemeProvider>
-			<TanStackRouterDevtools position="bottom-left" />
+			{/* <TanStackRouterDevtools position="bottom-left" /> */}
 		</>
 	);
 }

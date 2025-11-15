@@ -30,6 +30,7 @@ interface StaggeredMenuProps {
 	isFixed?: boolean;
 	onMenuOpen?: () => void;
 	onMenuClose?: () => void;
+	menuPanelHeader?: React.ReactNode;
 }
 
 export const StaggeredMenu = ({
@@ -49,6 +50,7 @@ export const StaggeredMenu = ({
 	isFixed = false,
 	onMenuOpen,
 	onMenuClose,
+	menuPanelHeader,
 }: StaggeredMenuProps) => {
 	const [open, setOpen] = useState(false);
 	const openRef = useRef(false);
@@ -114,10 +116,14 @@ export const StaggeredMenu = ({
     const numberEls = Array.from(panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item'));
     const socialTitle = panel.querySelector('.sm-socials-title');
     const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
+    const panelHeader = panel.querySelector('.sm-panel-header');
 
     const layerStates = layers.map(el => ({ el, start: Number(gsap.getProperty(el, 'xPercent')) }));
     const panelStart = Number(gsap.getProperty(panel, 'xPercent'));
 
+    if (panelHeader) {
+      gsap.set(panelHeader, { opacity: 0, y: -20 });
+    }
     if (itemEls.length) {
       gsap.set(itemEls, { yPercent: 140, rotate: 10 });
     }
@@ -145,6 +151,20 @@ export const StaggeredMenu = ({
       { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
       panelInsertTime
     );
+
+    if (panelHeader) {
+      const headerStart = panelInsertTime + panelDuration * 0.1;
+      tl.to(
+        panelHeader,
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'power3.out'
+        },
+        headerStart
+      );
+    }
 
     if (itemEls.length) {
       const itemsStartRatio = 0.15;
@@ -251,8 +271,10 @@ export const StaggeredMenu = ({
         }
         const socialTitle = panel.querySelector('.sm-socials-title');
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
+        const panelHeader = panel.querySelector('.sm-panel-header');
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
         if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
+        if (panelHeader) gsap.set(panelHeader, { opacity: 0, y: -20 });
         busyRef.current = false;
       }
     });
@@ -332,17 +354,29 @@ export const StaggeredMenu = ({
     const target = !openRef.current;
     openRef.current = target;
     setOpen(target);
+    
+    // Prevent body scroll on mobile when menu is open
     if (target) {
+      document.body.style.overflow = 'hidden';
       onMenuOpen?.();
       playOpen();
     } else {
+      document.body.style.overflow = '';
       onMenuClose?.();
       playClose();
     }
+    
     animateIcon(target);
     animateColor(target);
     animateText(target);
   }, [playOpen, playClose, animateIcon, animateColor, animateText, onMenuOpen, onMenuClose]);
+
+  // Cleanup: reset body scroll on unmount
+  React.useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   return (
 		<div
@@ -359,6 +393,15 @@ export const StaggeredMenu = ({
 			data-position={position}
 			data-open={open || undefined}
 		>
+      {/* Backdrop - click to close menu */}
+      {open && (
+        <div 
+          className="sm-backdrop" 
+          onClick={toggleMenu}
+          aria-hidden="true"
+        />
+      )}
+      
       <div ref={preLayersRef} className="sm-prelayers" aria-hidden="true">
 				{(() => {
 					const raw =
@@ -416,11 +459,27 @@ export const StaggeredMenu = ({
 
       <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open}>
         <div className="sm-panel-inner">
+          {menuPanelHeader && (
+            <div className="sm-panel-header">
+              {menuPanelHeader}
+            </div>
+          )}
           <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
             {items && items.length ? (
               items.map((it, idx) => (
                 <li className="sm-panel-itemWrap" key={it.label + idx}>
-                  <a className="sm-panel-item" href={it.link} aria-label={it.ariaLabel} data-index={idx + 1}>
+                  <a 
+                    className="sm-panel-item" 
+                    href={it.link} 
+                    aria-label={it.ariaLabel} 
+                    data-index={idx + 1}
+                    onClick={() => {
+                      // Close menu on mobile when clicking a link
+                      if (window.innerWidth <= 1024) {
+                        setTimeout(toggleMenu, 100);
+                      }
+                    }}
+                  >
                     <span className="sm-panel-itemLabel">{it.label}</span>
                   </a>
                 </li>

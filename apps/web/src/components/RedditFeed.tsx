@@ -214,63 +214,64 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
 
   return (
     <>
-      <section id="feed" className="relative mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-      {/* Search Bar */}
-      <div className="mb-8">
-        <SearchBar onSearch={handleSearch} showFilters={true} />
-      </div>
-
-      {sideFilters ? (
-        <aside className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-2 sm:flex">
-          <h3 className="mb-2 pl-1 text-xs uppercase tracking-wider text-white/50">Feed</h3>
-          {TABS.map((t) => {
-            const isActive = active === t.key;
-            return (
-              <button
-                key={t.key}
-                onClick={() => setActive(t.key)}
-                className={
-                  "rounded-xl border px-3 py-2 text-sm transition-colors " +
-                  (isActive
-                    ? "border-white/20 bg-white/15 text-white"
-                    : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10")
-                }
-              >
-                {t.label}
-              </button>
-            );
-          })}
-        </aside>
-      ) : (
-        <div className="z-40 mb-6 border-b border-white/10 bg-black/80 py-3 backdrop-blur supports-[backdrop-filter]:bg-black/60 sm:top-24 sm:mb-8">
-          <div className="flex items-center justify-between">
+      <section id="feed" className="relative mx-auto w-full max-w-6xl">
+      {/* Container with flex to reorder on mobile */}
+      <div className="flex flex-col">
+        {/* Dashboard Section - Order 1 on mobile, 2 on desktop */}
+        {sideFilters ? (
+          <>
+            {/* Desktop side filter */}
+            <aside className="fixed right-2 md:right-4 lg:right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-1.5 md:gap-2 md:flex">
+              <h3 className="mb-1.5 md:mb-2 pl-1 text-[10px] md:text-xs uppercase tracking-wider text-white/50">Feed</h3>
+              {TABS.map((t) => {
+                const isActive = active === t.key;
+                return (
+                  <button
+                    key={t.key}
+                    onClick={() => setActive(t.key)}
+                    className={
+                      "rounded-lg md:rounded-xl border px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm transition-all duration-200 " +
+                      (isActive
+                        ? "border-white/20 bg-white/15 text-white shadow-lg shadow-white/5"
+                        : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10")
+                    }
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </aside>
+          </>
+        ) : (
+          <div className="z-40 mb-3 sm:mb-6 order-1 sm:order-2 border-b border-white/10 bg-black/80 py-1.5 sm:py-4 backdrop-blur supports-[backdrop-filter]:bg-black/60">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
             <motion.h2
               initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="text-lg font-semibold text-white sm:text-xl"
+              className="text-sm sm:text-xl font-semibold text-white"
             >
               Feed
             </motion.h2>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-3 w-full sm:w-auto overflow-x-auto">
               {/* Refresh Button */}
               <Button
                 onClick={handleRefresh}
                 disabled={isRefreshing || loading}
                 variant="ghost"
                 size="sm"
-                className="h-8 border border-white/10 bg-white/5 px-3 text-white/80 hover:bg-white/10 hover:text-white disabled:opacity-50"
+                className="h-6 sm:h-9 border border-white/10 bg-white/5 px-1.5 sm:px-3 text-white/80 hover:bg-white/10 hover:text-white disabled:opacity-50 flex-shrink-0"
               >
-                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                <span className="ml-2 hidden sm:inline">
+                <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span className="ml-1 sm:ml-2 hidden md:inline text-[10px] sm:text-sm">
                   {isRefreshing ? 'Refreshing...' : 'Refresh'}
                 </span>
               </Button>
               
               {/* Tabs */}
-              <nav className="relative">
-                <ul className="flex gap-2 rounded-xl border border-white/10 bg-white/5 p-1 text-sm text-white/80">
+              <nav className="relative flex-1 sm:flex-none">
+                <ul className="flex gap-0.5 sm:gap-2 rounded-lg sm:rounded-xl border border-white/10 bg-white/5 p-0.5 sm:p-1 text-[10px] sm:text-sm text-white/80">
                   {TABS.map((t) => {
                     const isActive = active === t.key;
                     return (
@@ -278,7 +279,7 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
                         <button
                           onClick={() => setActive(t.key)}
                           className={
-                            "relative rounded-lg px-3 py-1 transition-colors" +
+                            "relative rounded-md sm:rounded-lg px-1.5 sm:px-3 py-0.5 sm:py-1.5 transition-colors whitespace-nowrap" +
                             (isActive ? " bg-white/15 text-white" : " hover:bg-white/10")
                           }
                         >
@@ -286,7 +287,7 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
                           {isActive && (
                             <motion.span
                               layoutId="tab-underline"
-                              className="absolute inset-0 -z-10 rounded-lg border border-white/15"
+                              className="absolute inset-0 -z-10 rounded-md sm:rounded-lg border border-white/15"
                               transition={{ type: "spring", stiffness: 350, damping: 30 }}
                             />
                           )}
@@ -299,15 +300,21 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
             </div>
           </div>
         </div>
-      )}
+        )}
+
+        {/* Search Bar - Order 2 on mobile, 1 on desktop */}
+        <div className="mb-4 sm:mb-8 order-2 sm:order-1">
+          <SearchBar onSearch={handleSearch} showFilters={true} />
+        </div>
+      </div>
 
       {/* Loading State */}
       {loading && (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-              className="h-96 animate-pulse rounded-3xl border border-white/10 bg-white/5"
+              className="h-80 sm:h-96 animate-pulse rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5"
             />
           ))}
         </div>
@@ -315,11 +322,11 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
 
       {/* Error State */}
       {error && !loading && posts.length === 0 && (
-        <div className="rounded-3xl border border-red-500/20 bg-red-500/5 p-8 text-center">
-          <p className="text-red-400">⚠️ {error}</p>
+        <div className="rounded-2xl sm:rounded-3xl border border-red-500/20 bg-red-500/5 p-6 sm:p-8 text-center">
+          <p className="text-sm sm:text-base text-red-400">⚠️ {error}</p>
           <button
             onClick={handleRefresh}
-            className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-6 py-2 text-sm text-white transition-colors hover:bg-white/10"
+            className="mt-4 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 px-4 sm:px-6 py-2 text-xs sm:text-sm text-white transition-colors hover:bg-white/10"
           >
             Try Again
           </button>
@@ -328,9 +335,9 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
 
       {/* Empty State */}
       {!loading && !error && posts.length === 0 && (
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-12 text-center">
-          <p className="text-xl text-white/70">📭 No tokenized posts yet</p>
-          <p className="mt-2 text-sm text-white/50">
+        <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-8 sm:p-12 text-center">
+          <p className="text-lg sm:text-xl text-white/70">📭 No tokenized posts yet</p>
+          <p className="mt-2 text-xs sm:text-sm text-white/50">
             Be the first to tokenize a Reddit post!
           </p>
         </div>
@@ -339,7 +346,7 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
       {/* Posts Grid */}
       {!loading && filtered.length > 0 && (
         <>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((post) => (
               <FeedCard key={post.id} post={post} onTrade={handleTrade} />
             ))}
@@ -347,18 +354,18 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
 
           {/* Load More Indicator */}
           {loadingMore && (
-            <div className="mt-8 flex justify-center">
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-6 py-3">
-                <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
-                <span className="text-sm text-white/70">Loading more posts...</span>
+            <div className="mt-6 sm:mt-8 flex justify-center">
+              <div className="flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 px-4 sm:px-6 py-2 sm:py-3">
+                <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
+                <span className="text-xs sm:text-sm text-white/70">Loading more posts...</span>
               </div>
             </div>
           )}
 
           {/* End of Results */}
           {!hasMore && !loadingMore && (
-            <div className="mt-8 text-center">
-              <p className="text-sm text-white/50">
+            <div className="mt-6 sm:mt-8 text-center">
+              <p className="text-xs sm:text-sm text-white/50">
                 🎉 You've reached the end! No more posts to load.
               </p>
             </div>

@@ -59,9 +59,19 @@ export default function Navbar() {
 					ariaLabel: "Go to home page",
 				},
 				{
+					label: "Feed",
+					link: "/feed",
+					ariaLabel: "View feed",
+				},
+				{
 					label: "Dashboard",
 					link: "/dashboard",
 					ariaLabel: "Open dashboard",
+				},
+				{
+					label: "Leaderboard",
+					link: "/dashboard?tab=leaderboard",
+					ariaLabel: "View leaderboard",
 				},
 				{
 					label: "Portfolio",
@@ -77,6 +87,11 @@ export default function Navbar() {
 					label: "Launch",
 					link: "/launch",
 					ariaLabel: "Launch a post",
+				},
+				{
+					label: "Profile",
+					link: "/dashboard?tab=profile",
+					ariaLabel: "View your profile",
 				},
 				{
 					label: "Features",
@@ -106,21 +121,21 @@ export default function Navbar() {
 				displaySocials={true}
 				displayItemNumbering={true}
 				logoComponent={
-					<div className="flex items-center justify-between w-full gap-3">
-						<span
-							style={{
-								fontWeight: 800,
-								fontSize: "1.25rem",
-								letterSpacing: "-0.02em",
-								color: "#ffffff",
-							}}
-						>
-							Redcircle
-						</span>
-						<div className="flex items-center gap-3">
-							<WalletButton />
-							{isAuthenticated && <UserProfile />}
-						</div>
+					<span
+						style={{
+							fontWeight: 800,
+							fontSize: "1.25rem",
+							letterSpacing: "-0.02em",
+							color: "#ffffff",
+						}}
+					>
+						Redcircle
+					</span>
+				}
+				menuPanelHeader={
+					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+					{isAuthenticated && <UserProfile />}
+						<WalletButton />
 					</div>
 				}
 				menuButtonColor="#ffffff"
