@@ -70,13 +70,13 @@ export default function ProfilePanel() {
   return (
     <section className="w-full">
       {/* Hero card */}
-      <div className="relative mb-6 overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-white/[0.04] to-white/[0.02] p-6 backdrop-blur">
-        <div className="flex items-center gap-4">
-          <div className="h-16 w-16 overflow-hidden rounded-2xl border border-white/15 bg-white/10">
+      <div className="relative mb-4 sm:mb-6 overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-gradient-to-br from-white/[0.04] to-white/[0.02] p-4 sm:p-6 backdrop-blur">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <div className="h-12 w-12 sm:h-16 sm:w-16 overflow-hidden rounded-xl sm:rounded-2xl border border-white/15 bg-white/10">
             {display.avatarUrl ? (
               <img src={display.avatarUrl} alt="avatar" className="h-full w-full object-cover" />
             ) : (
-              <div className="grid h-full w-full place-items-center text-white/60">u/</div>
+              <div className="grid h-full w-full place-items-center text-white/60 text-xs sm:text-base">u/</div>
             )}
           </div>
           <div className="min-w-0">
@@ -85,11 +85,11 @@ export default function ProfilePanel() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="truncate text-xl font-semibold text-white"
+              className="truncate text-base sm:text-lg md:text-xl font-semibold text-white"
             >
               u/{display.username ?? "guest"}
             </motion.h2>
-            <p className="text-sm text-white/60">Member • Trading on RedCircle</p>
+            <p className="text-xs sm:text-sm text-white/60">Member • Trading on RedCircle</p>
           </div>
         </div>
 
@@ -108,13 +108,13 @@ export default function ProfilePanel() {
       </div>
 
       {/* Stats grid */}
-      <div className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="mb-4 sm:mb-6 md:mb-8 grid grid-cols-2 gap-2 sm:gap-3 md:gap-5 lg:grid-cols-3">
         {loading ? (
           // Loading skeletons
           [1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl border border-white/10 bg-black/60 p-5 backdrop-blur">
-              <div className="h-4 w-16 animate-pulse rounded bg-white/10"></div>
-              <div className="mt-2 h-6 w-24 animate-pulse rounded bg-white/10"></div>
+            <div key={i} className="rounded-xl sm:rounded-2xl border border-white/10 bg-black/60 p-3 sm:p-4 md:p-5 backdrop-blur">
+              <div className="h-3 w-12 sm:h-4 sm:w-16 animate-pulse rounded bg-white/10"></div>
+              <div className="mt-1.5 sm:mt-2 h-5 w-16 sm:h-6 sm:w-24 animate-pulse rounded bg-white/10"></div>
             </div>
           ))
         ) : (
@@ -140,11 +140,11 @@ export default function ProfilePanel() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.35 }}
-              className="rounded-2xl border border-white/10 bg-black/60 p-5 text-white/80 backdrop-blur"
+              className="rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4 md:p-5 text-white/80 backdrop-blur col-span-1 last:col-span-2 lg:last:col-span-1"
             >
-              <div className="text-sm text-white/50">{s.label}</div>
+              <div className="text-xs sm:text-sm text-white/50">{s.label}</div>
               <div 
-                className={`mt-2 text-xl ${
+                className={`mt-1.5 sm:mt-2 text-base sm:text-lg md:text-xl font-semibold ${
                   s.label === "PnL" 
                     ? s.isPositive 
                       ? "text-green-400" 
@@ -165,18 +165,18 @@ export default function ProfilePanel() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.35 }}
-        className="mb-3 text-base font-semibold text-white"
+        className="mb-2 sm:mb-3 text-sm sm:text-base font-semibold text-white"
       >
         Recent Activity
       </motion.h3>
-      <div className="overflow-hidden rounded-2xl border border-white/10">
+      <div className="overflow-hidden rounded-xl sm:rounded-2xl border border-white/10">
         {loading ? (
-          <div className="bg-black/60 px-4 py-8 text-center backdrop-blur">
-            <div className="mx-auto h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
+          <div className="bg-white/5 px-3 py-6 sm:px-4 sm:py-8 text-center backdrop-blur">
+            <div className="mx-auto h-5 w-5 sm:h-6 sm:w-6 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
           </div>
         ) : recentActivity.length === 0 ? (
-          <div className="bg-black/60 px-4 py-8 text-center backdrop-blur">
-            <p className="text-sm text-white/60">No recent activity</p>
+          <div className="bg-white/5 px-3 py-6 sm:px-4 sm:py-8 text-center backdrop-blur">
+            <p className="text-xs sm:text-sm text-white/60">No recent activity</p>
           </div>
         ) : (
           <ul className="divide-y divide-white/10">
@@ -185,21 +185,22 @@ export default function ProfilePanel() {
               const diffMs = Date.now() - new Date(activity.createdAt).getTime();
               const diffMin = Math.max(1, Math.floor(diffMs / (1000 * 60)));
               const timeAgo = 
-                diffMin < 60 ? `${diffMin}m ago` :
-                diffMin < 1440 ? `${Math.floor(diffMin / 60)}h ago` :
-                `${Math.floor(diffMin / 1440)}d ago`;
+                diffMin < 60 ? `${diffMin}m` :
+                diffMin < 1440 ? `${Math.floor(diffMin / 60)}h` :
+                `${Math.floor(diffMin / 1440)}d`;
 
               const pricePerToken = parseFloat(activity.pricePerToken || "0");
               const totalValue = parseFloat(activity.totalValue || "0");
               
               return (
-                <li key={activity.transactionId} className="grid grid-cols-12 bg-black/60 px-4 py-3 text-sm text-white/80 backdrop-blur">
-                  <div className="col-span-6 truncate">
-                    {activity.type === "buy" ? "Bought" : "Sold"} {(activity.amount || 0).toLocaleString()} {activity.postTokenSymbol || "tokens"} at {pricePerToken.toFixed(6)} SOL
+                <li key={activity.transactionId} className="grid grid-cols-12 bg-white/5 px-2 py-2 sm:px-4 sm:py-3 text-[10px] sm:text-xs md:text-sm text-white/80 backdrop-blur gap-1 sm:gap-2">
+                  <div className="col-span-5 sm:col-span-6 truncate">
+                    <span className="font-medium">{activity.type === "buy" ? "Bought" : "Sold"}</span> {(activity.amount || 0).toLocaleString()} {activity.postTokenSymbol || "tokens"}
+                    <span className="hidden sm:inline"> at {pricePerToken.toFixed(6)} SOL</span>
                   </div>
-                  <div className="col-span-3 text-white/60">{timeAgo}</div>
-                  <div className={`col-span-3 text-right ${activity.type === "buy" ? "text-emerald-400" : "text-red-400"}`}>
-                    {totalValue.toFixed(4)} SOL
+                  <div className="col-span-3 sm:col-span-3 text-white/60">{timeAgo}</div>
+                  <div className={`col-span-4 sm:col-span-3 text-right font-medium ${activity.type === "buy" ? "text-green-400" : "text-red-400"}`}>
+                    {totalValue.toFixed(4)} <span className="hidden sm:inline">SOL</span>
                   </div>
                 </li>
               );
