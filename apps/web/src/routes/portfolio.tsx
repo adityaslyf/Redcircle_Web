@@ -5,6 +5,8 @@ import { TrendingUp, TrendingDown, Wallet, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchWithAuth, getApiUrl } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import MobileNav from "@/components/MobileNav";
+import DesktopSidebar from "@/components/DesktopSidebar";
 
 export const Route = createFileRoute("/portfolio")({
   component: PortfolioPage,
@@ -97,7 +99,11 @@ function PortfolioPage() {
   }
 
   return (
-    <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-32 pb-20 sm:px-6 lg:px-8">
+    <>
+      <MobileNav currentPage="portfolio" />
+      <DesktopSidebar currentPage="portfolio" />
+      
+      <div className="mx-auto min-h-screen w-full max-w-7xl px-4 pt-32 pb-20 sm:px-6 md:pl-32 lg:pl-36 lg:px-8">
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
@@ -269,6 +275,7 @@ function PortfolioPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

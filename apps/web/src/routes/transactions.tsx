@@ -6,6 +6,8 @@ import { motion } from "motion/react";
 import { RefreshCw, ArrowUpRight, ArrowDownRight, Filter, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import MobileNav from "@/components/MobileNav";
+import DesktopSidebar from "@/components/DesktopSidebar";
 
 // Define types for transaction data
 interface Transaction {
@@ -146,8 +148,12 @@ function TransactionsPage() {
   }
 
   return (
-    <div className="relative min-h-screen pt-24 px-6 pb-20">
-      <div className="mx-auto w-full max-w-6xl">
+    <>
+      <MobileNav currentPage="transactions" />
+      <DesktopSidebar currentPage="transactions" />
+      
+      <div className="relative min-h-screen pt-24 px-6 pb-20 md:pl-32 lg:pl-36">
+        <div className="mx-auto w-full max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -384,8 +390,9 @@ function TransactionsPage() {
             )}
           </>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
