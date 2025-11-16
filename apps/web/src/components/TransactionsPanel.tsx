@@ -116,13 +116,13 @@ export default function TransactionsPanel() {
 
   return (
     <div className="w-full">
-      <div className="mb-4 sm:mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 relative z-[10002]">
+      <div className="mb-4 sm:mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white">Transaction History</h1>
         </div>
         
         {/* Filter Toggle */}
-        <div className="flex items-center gap-1 sm:gap-1.5 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-0.5 sm:p-1 relative z-[10002]">
+        <div className="flex items-center gap-1 sm:gap-1.5 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-0.5 sm:p-1">
           <button
             onClick={() => setFilterType("all")}
             className={cn(

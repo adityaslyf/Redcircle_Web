@@ -17,7 +17,7 @@ const NAV_ITEMS = [
 
 export default function DesktopSidebar({ currentPage, onNavigate }: DesktopSidebarProps) {
   return (
-    <aside className="fixed left-2 md:left-4 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-1.5 md:gap-2 md:flex">
+    <aside className="fixed left-2 md:left-4 top-1/2 hidden -translate-y-1/2 flex-col gap-1.5 md:gap-2 md:flex" style={{ zIndex: 40 }}>
       <h2 className="mb-1.5 md:mb-2 pl-1 text-[10px] md:text-xs uppercase tracking-wider text-white/50">
         Dashboard
       </h2>

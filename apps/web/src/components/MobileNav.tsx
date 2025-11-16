@@ -25,11 +25,11 @@ const NAV_ITEMS: {
 
 export default function MobileNav({ currentPage }: MobileNavProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[10001] md:hidden safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 md:hidden safe-area-inset-bottom" style={{ zIndex: 50 }}>
       {/* Glassmorphism background with gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/95 to-black/80 backdrop-blur-xl border-t border-white/10 pointer-events-none"></div>
       
-      <div className="relative flex gap-1 px-2 py-2.5 justify-between z-10">
+      <div className="relative flex gap-1 px-2 py-2.5 justify-between">
         {NAV_ITEMS.map((item) => {
           const isActive = currentPage === item.key;
           const Icon = item.icon;
@@ -96,7 +96,7 @@ export default function MobileNav({ currentPage }: MobileNavProps) {
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 }
 

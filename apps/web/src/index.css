@@ -17,6 +17,22 @@ body {
   }
 }
 
+/* Fix stacking context - Prevent z-index inheritance issues */
+body > #app {
+  position: relative;
+}
+
+/* Content should never need z-index - use natural document flow */
+main, section, article, div:not([class*="fixed"]):not([class*="absolute"]) {
+  position: relative;
+  z-index: auto;
+}
+
+/* Only fixed/absolute positioned elements should have z-index */
+[class*="fixed"], [class*="absolute"] {
+  isolation: isolate;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
