@@ -3,6 +3,7 @@ import { SignInPage } from "../components/ui/sign-in";
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { getApiUrl } from "../lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/signin")({
   component: SignIn,
@@ -44,7 +45,9 @@ function SignIn() {
       };
       
       const message = errorMessages[error] || `Unknown error: ${error}`;
-      alert(`Authentication Error\n\n${message}\n\n⚠️ IMPORTANT: Check your backend terminal for detailed error logs!`);
+      toast.error("Authentication error", {
+        description: `${message}\n\nCheck your backend terminal for detailed error logs.`,
+      });
       
       // Clean up URL
       window.history.replaceState({}, document.title, "/signin");
@@ -67,7 +70,9 @@ function SignIn() {
         navigate({ to: redirect || "/" });
       } catch (err) {
         console.error("❌ Error parsing user data:", err);
-        alert("Failed to complete sign in. Please try again.");
+        toast.error("Failed to complete sign in", {
+          description: "We couldn't parse the user data from Reddit. Please try again.",
+        });
       }
     }
   }, [login, navigate]);
@@ -82,7 +87,9 @@ function SignIn() {
     console.log("Email/Password sign in attempt:", { email, rememberMe, hasPassword: !!password });
     
     // TODO: Implement email/password authentication
-    alert("Email/password authentication is not yet implemented. Please use Reddit sign-in.");
+    toast.info("Email/password sign-in not available yet", {
+      description: "Please use Reddit sign-in to access RedCircle.",
+    });
   };
 
   const handleRedditSignIn = () => {
@@ -98,17 +105,24 @@ function SignIn() {
 
   const handleGoogleSignIn = () => {
     // TODO: Implement Google OAuth
-    alert("Google sign-in is not yet implemented. Please use Reddit sign-in.");
+    toast.info("Google sign-in coming soon", {
+      description: "For now, please continue with Reddit sign-in.",
+    });
   };
 
   const handleResetPassword = () => {
     // TODO: Implement password reset
-    alert("Password reset is not yet implemented.");
+    toast.info("Password reset not available yet", {
+      description: "Feature coming soon.",
+    });
   };
 
   const handleCreateAccount = () => {
     // TODO: Implement account creation
-    alert("Account creation is not yet implemented. You can sign in with Reddit to create an account automatically.");
+    toast.info("Account creation handled via Reddit", {
+      description:
+        "A RedCircle account is created automatically when you sign in with Reddit.",
+    });
   };
 
   return (

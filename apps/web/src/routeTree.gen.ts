@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TransactionsRouteImport } from './routes/transactions'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SigninRouteImport } from './routes/signin'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as LaunchRouteImport } from './routes/launch'
 import { Route as FeedRouteImport } from './routes/feed'
@@ -23,9 +25,19 @@ const TransactionsRoute = TransactionsRouteImport.update({
   path: '/transactions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SigninRoute = SigninRouteImport.update({
   id: '/signin',
   path: '/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -65,7 +77,9 @@ export interface FileRoutesByFullPath {
   '/feed': typeof FeedRoute
   '/launch': typeof LaunchRoute
   '/portfolio': typeof PortfolioRoute
+  '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
   '/transactions': typeof TransactionsRoute
   '/token/$tokenId': typeof TokenTokenIdRoute
 }
@@ -75,7 +89,9 @@ export interface FileRoutesByTo {
   '/feed': typeof FeedRoute
   '/launch': typeof LaunchRoute
   '/portfolio': typeof PortfolioRoute
+  '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
   '/transactions': typeof TransactionsRoute
   '/token/$tokenId': typeof TokenTokenIdRoute
 }
@@ -86,7 +102,9 @@ export interface FileRoutesById {
   '/feed': typeof FeedRoute
   '/launch': typeof LaunchRoute
   '/portfolio': typeof PortfolioRoute
+  '/privacy': typeof PrivacyRoute
   '/signin': typeof SigninRoute
+  '/terms': typeof TermsRoute
   '/transactions': typeof TransactionsRoute
   '/token/$tokenId': typeof TokenTokenIdRoute
 }
@@ -98,7 +116,9 @@ export interface FileRouteTypes {
     | '/feed'
     | '/launch'
     | '/portfolio'
+    | '/privacy'
     | '/signin'
+    | '/terms'
     | '/transactions'
     | '/token/$tokenId'
   fileRoutesByTo: FileRoutesByTo
@@ -108,7 +128,9 @@ export interface FileRouteTypes {
     | '/feed'
     | '/launch'
     | '/portfolio'
+    | '/privacy'
     | '/signin'
+    | '/terms'
     | '/transactions'
     | '/token/$tokenId'
   id:
@@ -118,7 +140,9 @@ export interface FileRouteTypes {
     | '/feed'
     | '/launch'
     | '/portfolio'
+    | '/privacy'
     | '/signin'
+    | '/terms'
     | '/transactions'
     | '/token/$tokenId'
   fileRoutesById: FileRoutesById
@@ -129,7 +153,9 @@ export interface RootRouteChildren {
   FeedRoute: typeof FeedRoute
   LaunchRoute: typeof LaunchRoute
   PortfolioRoute: typeof PortfolioRoute
+  PrivacyRoute: typeof PrivacyRoute
   SigninRoute: typeof SigninRoute
+  TermsRoute: typeof TermsRoute
   TransactionsRoute: typeof TransactionsRoute
   TokenTokenIdRoute: typeof TokenTokenIdRoute
 }
@@ -143,11 +169,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TransactionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signin': {
       id: '/signin'
       path: '/signin'
       fullPath: '/signin'
       preLoaderRoute: typeof SigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -201,7 +241,9 @@ const rootRouteChildren: RootRouteChildren = {
   FeedRoute: FeedRoute,
   LaunchRoute: LaunchRoute,
   PortfolioRoute: PortfolioRoute,
+  PrivacyRoute: PrivacyRoute,
   SigninRoute: SigninRoute,
+  TermsRoute: TermsRoute,
   TransactionsRoute: TransactionsRoute,
   TokenTokenIdRoute: TokenTokenIdRoute,
 }

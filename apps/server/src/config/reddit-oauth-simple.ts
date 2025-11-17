@@ -29,7 +29,10 @@ if (!REDDIT_CLIENT_ID || !REDDIT_CLIENT_SECRET || !REDDIT_REDIRECT_URI || !FRONT
 // Step 1: Redirect to Reddit
 router.get("/auth/reddit", (_req, res) => {
   const state = Math.random().toString(36).substring(7);
-  const authUrl = `https://www.reddit.com/api/v1/authorize?client_id=${REDDIT_CLIENT_ID}&response_type=code&state=${state}&redirect_uri=${REDDIT_REDIRECT_URI}&duration=permanent&scope=identity`;
+  // URL encode the redirect_uri to handle special characters
+  const encodedRedirectUri = encodeURIComponent(REDDIT_REDIRECT_URI);
+  const authUrl = `https://www.reddit.com/api/v1/authorize?client_id=${REDDIT_CLIENT_ID}&response_type=code&state=${state}&redirect_uri=${encodedRedirectUri}&duration=permanent&scope=identity`;
+  console.log("🔴 Redirecting to Reddit OAuth:", authUrl);
   res.redirect(authUrl);
 });
 

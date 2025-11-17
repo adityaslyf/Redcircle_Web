@@ -5,6 +5,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection } from "@solana/web3.js";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import type { FeedPost } from "@/components/FeedCard";
 import { cn } from "@/lib/utils";
@@ -115,12 +116,16 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      alert("Please enter a valid amount");
+      toast.error("Invalid amount", {
+        description: "Please enter a positive token amount to trade.",
+      });
       return;
     }
 
     if (!sendTransaction) {
-      alert("Wallet does not support sending transactions");
+      toast.error("Wallet not supported", {
+        description: "Your connected wallet cannot send transactions.",
+      });
       return;
     }
 
@@ -209,12 +214,23 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
       });
 
       // Success!
-      alert(
-        `🎉 ${tradeType === "buy" ? "Purchase" : "Sale"} Successful!\n\n` +
-        `${tradePreview.tokenAmount} tokens ${tradeType === "buy" ? "bought" : "sold"}\n` +
-        `Total: ${tradePreview.finalTotal.toFixed(6)} SOL\n` +
-        `Transaction: ${signature.slice(0, 16)}...\n\n` +
-        `View on Solscan:\nhttps://solscan.io/tx/${signature}?cluster=devnet`
+      toast.success(
+        tradeType === "buy" ? "Purchase successful 🎉" : "Sale successful 🎉",
+        {
+          description:
+            `${tradePreview.tokenAmount} tokens ` +
+            `${tradeType === "buy" ? "bought" : "sold"} for ` +
+            `${tradePreview.finalTotal.toFixed(6)} SOL.`,
+          action: {
+            label: "View on Solscan",
+            onClick: () =>
+              window.open(
+                `https://solscan.io/tx/${signature}?cluster=devnet`,
+                "_blank",
+                "noopener,noreferrer",
+              ),
+          },
+        },
       );
       
       // Refresh stats and close
@@ -235,7 +251,9 @@ export default function TradingModal({ post, isOpen, onClose }: TradingModalProp
         errorMessage += "Please try again.";
       }
       
-      alert(errorMessage);
+      toast.error("Trade failed", {
+        description: errorMessage,
+      });
     } finally {
       setIsSubmitting(false);
     }

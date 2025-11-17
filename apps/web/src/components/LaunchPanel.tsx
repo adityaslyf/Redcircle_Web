@@ -1,5 +1,7 @@
 import { motion } from "motion/react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { TrendingUp, Coins, Users, Sparkles, ExternalLink, AlertCircle } from "lucide-react";
@@ -21,6 +23,7 @@ interface RedditPostPreview {
 
 export default function LaunchPanel() {
   const { user } = useAuth();
+  const { connected, publicKey } = useWallet();
   const [url, setUrl] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [postPreview, setPostPreview] = useState<RedditPostPreview | null>(null);
@@ -114,23 +117,21 @@ export default function LaunchPanel() {
       }
 
       if (data.success && data.post) {
-        const blockchainInfo = data.blockchain 
-          ? `\n\n🔗 Blockchain Details:\n` +
-            `Mint Address: ${data.blockchain.mintAddress}\n` +
-            `Transaction: ${data.blockchain.transactionSignature.substring(0, 8)}...\n` +
-            `\n📊 View on Solscan: ${data.blockchain.explorerUrl}`
-          : '';
+        const explorerUrl = data.blockchain?.explorerUrl as string | undefined;
 
-        alert(
-          `🎉 Token Minted on Solana!\n\n` +
-          `✅ ${data.message}\n\n` +
-          `Token Symbol: ${data.post.tokenSymbol}\n` +
-          `Supply: ${initialSupply} tokens\n` +
-          `Initial Price: ${initialPrice} SOL\n` +
-          `Market Cap: ${data.post.marketCap} SOL\n` +
-          `Status: ${data.post.status}` +
-          blockchainInfo
-        );
+        toast.success("Token minted on Solana 🎉", {
+          description:
+            `Post tokenized successfully.\n` +
+            `Symbol: ${data.post.tokenSymbol} • Supply: ${initialSupply} • Price: ${initialPrice} SOL\n` +
+            `Market Cap: ${data.post.marketCap} SOL • Status: ${data.post.status}`,
+          action: explorerUrl
+            ? {
+                label: "View on Solscan",
+                onClick: () =>
+                  window.open(explorerUrl, "_blank", "noopener,noreferrer"),
+              }
+            : undefined,
+        });
         
         // Reset form
         setUrl("");
@@ -149,16 +150,33 @@ export default function LaunchPanel() {
   };
 
   return (
-    <section className="w-full max-w-5xl mx-auto">
+    <section className="w-full max-w-5xl mx-auto relative">
+      {/* Soft glowing background for the launch panel */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 opacity-60"
+        style={{
+          background:
+            "radial-gradient(800px circle at 0% 0%, rgba(168,85,247,0.12), transparent 60%), radial-gradient(800px circle at 100% 100%, rgba(59,130,246,0.12), transparent 60%)",
+        }}
+      />
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         className="mb-4 sm:mb-6"
       >
-        <h2 className="mb-1.5 sm:mb-2 text-xl sm:text-2xl md:text-3xl font-bold text-white flex items-center gap-2 sm:gap-3">
+        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-[10px] sm:text-xs text-purple-100 mb-2">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-500/70 text-[9px] font-semibold">
+            New
+          </span>
+          Turn viral Reddit threads into tradable on-chain assets.
+        </div>
+        <h2 className="mb-1.5 sm:mb-2 text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 sm:gap-3">
           <Sparkles className="w-5 h-5 sm:w-6 sm:w-6 md:w-7 md:h-7 text-purple-400" />
-          Tokenize a Reddit Post
+          <span className="bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
+            Tokenize a Reddit Post
+          </span>
         </h2>
         <p className="text-white/60 text-xs sm:text-sm md:text-base">
           Submit a Reddit post and create tradable tokens backed by its momentum
@@ -349,7 +367,9 @@ export default function LaunchPanel() {
                 </div>
                 <div>
                   <p className="text-white/50 text-[10px] sm:text-xs">Your Wallet</p>
-                  <p className="text-white font-semibold text-xs sm:text-sm truncate">{user?.walletAddress || "Not connected"}</p>
+                  <p className="text-white font-semibold text-xs sm:text-sm truncate">
+                    {connected && publicKey ? `${publicKey.toBase58().substring(0, 4)}...${publicKey.toBase58().substring(publicKey.toBase58().length - 4)}` : "Not connected"}
+                  </p>
                 </div>
               </div>
             </div>

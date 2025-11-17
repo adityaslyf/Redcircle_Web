@@ -111,27 +111,22 @@ export function AnimatedFooter() {
         </div>
 
         {/* Links */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
           <MotionCol title="Platform" links={[
             { label: "Dashboard", href: "/dashboard" },
-            { label: "Browse Posts", href: "/posts" },
-            { label: "Marketplace", href: "/market" },
+            { label: "Feed", href: "/dashboard?tab=feed" },
+            { label: "Launch Token", href: "/dashboard?tab=launch" },
+            { label: "Portfolio", href: "/dashboard?tab=portfolio" },
           ]} delay={0.05} />
-          <MotionCol title="Features" links={[
-            { label: "Tokenize Posts", href: "/tokenize" },
-            { label: "Trade Tokens", href: "/trade" },
-            { label: "Earn Rewards", href: "/rewards" },
+          <MotionCol title="Legal" links={[
+            { label: "Privacy Policy", href: "/privacy" },
+            { label: "Terms of Service", href: "/terms" },
           ]} delay={0.1} />
-          <MotionCol title="Resources" links={[
-            { label: "Documentation", href: "/docs" },
-            { label: "Whitepaper", href: "/whitepaper" },
-            { label: "API", href: "/api" },
-          ]} delay={0.15} />
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
           >
             <h3 className="text-xs uppercase tracking-wider text-neutral-500 mb-4 font-satoshi">Follow</h3>
             <div className="flex items-center gap-5 text-neutral-400">
