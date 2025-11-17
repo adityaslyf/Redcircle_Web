@@ -150,36 +150,26 @@ export default function LaunchPanel() {
   };
 
   return (
-    <section className="w-full max-w-5xl mx-auto relative">
-      {/* Soft glowing background for the launch panel */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-60"
-        style={{
-          background:
-            "radial-gradient(800px circle at 0% 0%, rgba(168,85,247,0.12), transparent 60%), radial-gradient(800px circle at 100% 100%, rgba(59,130,246,0.12), transparent 60%)",
-        }}
-      />
+    <section className="w-full max-w-5xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-4 sm:mb-6"
+        className="mb-6 sm:mb-8"
       >
-        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-[10px] sm:text-xs text-purple-100 mb-2">
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-purple-500/70 text-[9px] font-semibold">
-            New
+        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/40 bg-purple-500/10 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm text-purple-300 mb-4 font-medium">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
           </span>
-          Turn viral Reddit threads into tradable on-chain assets.
+          Turn viral Reddit threads into tradable on-chain assets
         </div>
-        <h2 className="mb-1.5 sm:mb-2 text-xl sm:text-2xl md:text-3xl font-bold flex items-center gap-2 sm:gap-3">
-          <Sparkles className="w-5 h-5 sm:w-6 sm:w-6 md:w-7 md:h-7 text-purple-400" />
-          <span className="bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
-            Tokenize a Reddit Post
-          </span>
+        <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl font-bold text-white flex items-center gap-2 sm:gap-3 font-satoshi">
+          <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-purple-400" />
+          Tokenize a Reddit Post
         </h2>
-        <p className="text-white/60 text-xs sm:text-sm md:text-base">
-          Submit a Reddit post and create tradable tokens backed by its momentum
+        <p className="text-white/70 text-sm sm:text-base md:text-lg max-w-2xl">
+          Submit a Reddit post URL and create tradable tokens backed by its viral momentum
         </p>
       </motion.div>
 
@@ -422,14 +412,28 @@ export default function LaunchPanel() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-6 sm:mt-8 rounded-xl sm:rounded-2xl border border-blue-500/20 bg-blue-500/5 p-3 sm:p-5 text-xs sm:text-sm text-blue-300/80"
+          className="mt-6 sm:mt-8 rounded-xl sm:rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm p-4 sm:p-6"
         >
-          <h4 className="font-semibold text-blue-400 mb-1.5 sm:mb-2">💡 How it works</h4>
-          <ul className="space-y-0.5 sm:space-y-1 list-disc list-inside text-white/60">
-            <li>Paste any Reddit post URL to fetch details</li>
-            <li>Configure token supply and initial pricing</li>
-            <li>Launch your token and start trading</li>
-            <li>Earn rewards as curator</li>
+          <h4 className="font-semibold text-blue-300 mb-3 sm:mb-4 text-sm sm:text-base flex items-center gap-2">
+            <span className="text-lg">💡</span> How it works
+          </h4>
+          <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-white/80">
+            <li className="flex items-start gap-2">
+              <span className="text-purple-400 mt-0.5">→</span>
+              <span>Paste any Reddit post URL to fetch details</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-purple-400 mt-0.5">→</span>
+              <span>Configure token supply and initial pricing</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-purple-400 mt-0.5">→</span>
+              <span>Launch your token and start trading</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-purple-400 mt-0.5">→</span>
+              <span>Earn rewards as curator</span>
+            </li>
           </ul>
         </motion.div>
       )}
