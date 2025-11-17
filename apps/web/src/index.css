@@ -23,7 +23,8 @@ body > #app {
 }
 
 /* Content should never need z-index - use natural document flow */
-main, section, article, div:not([class*="fixed"]):not([class*="absolute"]) {
+/* EXCEPT: sticky elements (parallax cards) need their z-index */
+main, section, article, div:not([class*="fixed"]):not([class*="absolute"]):not([class*="sticky"]) {
   position: relative;
   z-index: auto;
 }
