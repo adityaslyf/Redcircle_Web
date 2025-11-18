@@ -1,5 +1,5 @@
 {
-  "name": "@Redcircle/db",
+  "name": "@redcircle/db",
   "type": "module",
   "exports": {
     ".": {
