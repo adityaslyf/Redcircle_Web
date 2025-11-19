@@ -22,7 +22,7 @@ function SignIn() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate({ to: redirect || "/" });
+      navigate({ to: redirect || "/dashboard" });
     }
   }, [isAuthenticated, navigate, redirect]);
 
@@ -58,16 +58,17 @@ function SignIn() {
       try {
         const user = JSON.parse(decodeURIComponent(userStr));
         
+        console.log("🔐 OAuth callback received - logging in user:", user.username);
+        
         // Use auth context to log in
         login(token, user);
         
-        console.log("✅ Successfully signed in:", user);
+        console.log("✅ Login successful, redirecting to dashboard...");
         
-        // Clean up URL
-        window.history.replaceState({}, document.title, "/signin");
-        
-        // Redirect to intended page or home
-        navigate({ to: redirect || "/" });
+        // Redirect immediately to dashboard
+        setTimeout(() => {
+          navigate({ to: redirect || "/dashboard" });
+        }, 100);
       } catch (err) {
         console.error("❌ Error parsing user data:", err);
         toast.error("Failed to complete sign in", {
@@ -75,22 +76,7 @@ function SignIn() {
         });
       }
     }
-  }, [login, navigate]);
-
-  const handleSignIn = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const rememberMe = formData.get("rememberMe");
-
-    console.log("Email/Password sign in attempt:", { email, rememberMe, hasPassword: !!password });
-    
-    // TODO: Implement email/password authentication
-    toast.info("Email/password sign-in not available yet", {
-      description: "Please use Reddit sign-in to access RedCircle.",
-    });
-  };
+  }, [login, navigate, redirect]);
 
   const handleRedditSignIn = () => {
     console.log("🔴 Reddit sign-in button clicked!");
@@ -101,28 +87,6 @@ function SignIn() {
     console.log("🔴 Redirecting to:", `${backendUrl}/auth/reddit`);
     
     window.location.href = `${backendUrl}/auth/reddit`;
-  };
-
-  const handleGoogleSignIn = () => {
-    // TODO: Implement Google OAuth
-    toast.info("Google sign-in coming soon", {
-      description: "For now, please continue with Reddit sign-in.",
-    });
-  };
-
-  const handleResetPassword = () => {
-    // TODO: Implement password reset
-    toast.info("Password reset not available yet", {
-      description: "Feature coming soon.",
-    });
-  };
-
-  const handleCreateAccount = () => {
-    // TODO: Implement account creation
-    toast.info("Account creation handled via Reddit", {
-      description:
-        "A RedCircle account is created automatically when you sign in with Reddit.",
-    });
   };
 
   return (
@@ -158,11 +122,7 @@ function SignIn() {
           text: "I've been using RedCircle for 6 months. The rewards system is phenomenal!",
         },
       ]}
-      onSignIn={handleSignIn}
       onRedditSignIn={handleRedditSignIn}
-      onGoogleSignIn={handleGoogleSignIn}
-      onResetPassword={handleResetPassword}
-      onCreateAccount={handleCreateAccount}
     />
   );
 }

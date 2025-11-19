@@ -2,11 +2,13 @@ import { BackgroundPaths } from "@/components/ui/background-paths";
 import { SplashCursor } from "@/components/ui/splash-cursor";
 import { AnimatedFooter } from "@/components/ui/animated-footer";
 import FeaturesParallax from "@/components/FeaturesParallax";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { WorldMapDemo } from "@/components/ui/world-map-demo";
 import RedCircleCards from "@/components/RedCircleCards";
 import { RedCircleTimeline } from "@/components/RedCircleTimeline";
 import Testimonials from "@/components/ui/testimonials";
+import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/")({
 	component: HomeComponent,
@@ -14,6 +16,16 @@ export const Route = createFileRoute("/")({
 
 
 function HomeComponent() {
+	const { isAuthenticated } = useAuth();
+	const navigate = useNavigate();
+
+	// Redirect authenticated users to dashboard
+	useEffect(() => {
+		if (isAuthenticated) {
+			navigate({ to: "/dashboard" });
+		}
+	}, [isAuthenticated, navigate]);
+
 	return (
 		<div className="relative flex min-h-screen flex-col">
 			<SplashCursor />
