@@ -1,5 +1,5 @@
 import { pgTable, uuid, decimal, integer, timestamp } from "drizzle-orm/pg-core";
-import { posts } from "./posts";
+import { posts } from "./posts.js";
 
 export const priceHistory = pgTable("price_history", {
   id: uuid("id").primaryKey().defaultRandom(),
