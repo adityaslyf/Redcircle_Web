@@ -41,7 +41,7 @@ app.get("/health", (_req, res) => {
 });
 
 // Global error handler
-app.use((err: Error, req: express.Request, res: express.Response) => {
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
 	console.error("\n❌ === Global Error Handler ===");
 	console.error("Error:", err);
 	console.error("Path:", req.path);
@@ -54,7 +54,7 @@ app.use((err: Error, req: express.Request, res: express.Response) => {
 	});
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, "0.0.0.0", () => {
-	console.log(`\n🚀 Server running on port ${port}\n`);
+	const port = process.env.PORT || 3000;
+	app.listen(Number(port), () => {
+	console.log(`\nServer running on port ${port}\n`);
 });
