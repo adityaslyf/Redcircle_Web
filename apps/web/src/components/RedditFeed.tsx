@@ -243,35 +243,32 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
             </aside>
           </>
         ) : (
-          <div className="z-40 mb-3 sm:mb-6 order-1 sm:order-2 border-b border-white/10 bg-black/80 py-1.5 sm:py-4 backdrop-blur supports-[backdrop-filter]:bg-black/60">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+          <div className="z-40 mb-6 order-1 sm:order-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <motion.h2
               initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4 }}
-              className="text-sm sm:text-xl font-semibold text-white"
+              className="text-2xl sm:text-3xl font-bold text-white tracking-tight"
             >
               Feed
             </motion.h2>
-            <div className="flex items-center gap-1.5 sm:gap-3 w-full sm:w-auto overflow-x-auto">
+            <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto scrollbar-hide">
               {/* Refresh Button */}
               <Button
                 onClick={handleRefresh}
                 disabled={isRefreshing || loading}
                 variant="ghost"
                 size="sm"
-                className="h-6 sm:h-9 border border-white/10 bg-white/5 px-1.5 sm:px-3 text-white/80 hover:bg-white/10 hover:text-white disabled:opacity-50 flex-shrink-0"
+                className="h-9 px-3 rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50 flex-shrink-0 transition-all"
               >
-                <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                <span className="ml-1 sm:ml-2 hidden md:inline text-[10px] sm:text-sm">
-                  {isRefreshing ? 'Refreshing...' : 'Refresh'}
-                </span>
+                <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
               </Button>
               
               {/* Tabs */}
               <nav className="relative flex-1 sm:flex-none">
-                <ul className="flex gap-0.5 sm:gap-2 rounded-lg sm:rounded-xl border border-white/10 bg-white/5 p-0.5 sm:p-1 text-[10px] sm:text-sm text-white/80">
+                <ul className="flex gap-1 rounded-full border border-white/10 bg-white/5 p-1">
                   {TABS.map((t) => {
                     const isActive = active === t.key;
                     return (
@@ -279,16 +276,16 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
                         <button
                           onClick={() => setActive(t.key)}
                           className={
-                            "relative rounded-md sm:rounded-lg px-1.5 sm:px-3 py-0.5 sm:py-1.5 transition-colors whitespace-nowrap" +
-                            (isActive ? " bg-white/15 text-white" : " hover:bg-white/10")
+                            "relative rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium transition-all whitespace-nowrap " +
+                            (isActive ? "text-white" : "text-white/50 hover:text-white/80")
                           }
                         >
                           {t.label}
                           {isActive && (
                             <motion.span
-                              layoutId="tab-underline"
-                              className="absolute inset-0 -z-10 rounded-md sm:rounded-lg border border-white/15"
-                              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                              layoutId="tab-bg"
+                              className="absolute inset-0 -z-10 rounded-full bg-white/10 border border-white/10 shadow-sm"
+                              transition={{ type: "spring", stiffness: 300, damping: 30 }}
                             />
                           )}
                         </button>
