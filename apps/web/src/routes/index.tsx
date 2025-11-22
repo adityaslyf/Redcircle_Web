@@ -1,5 +1,4 @@
 import { BackgroundPaths } from "@/components/ui/background-paths";
-import { SplashCursor } from "@/components/ui/splash-cursor";
 import { AnimatedFooter } from "@/components/ui/animated-footer";
 import FeaturesParallax from "@/components/FeaturesParallax";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -28,7 +27,6 @@ function HomeComponent() {
 
 	return (
 		<div className="relative flex min-h-screen flex-col">
-			<SplashCursor />
 			<BackgroundPaths 
 				title="Turn Viral Posts Into Digital Assets"
 				subtitle="RedCircle tokenizes Reddit content on Solana blockchain, creating a new economy around social media virality."

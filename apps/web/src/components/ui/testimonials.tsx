@@ -13,37 +13,37 @@ const testimonials: Testimonial[] = [
   {
     quote:
       "RedCircle is redefining social finance. Turning Reddit virality into tradeable assets on Solana is a game-changer.",
-    name: "Ava Chen",
-    title: "DeFi Research Lead, Helios",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=256&q=80",
+    name: "Utkarsh Srivastava",
+    title: "Superteam India Member",
+    avatar: "https://pbs.twimg.com/profile_images/1939628385925496832/OEeL3rR1_400x400.jpg",
   },
   {
     quote:
       "The tokenization flow is smooth and intuitive. I discovered posts, bought tokens, and saw real upside.",
-    name: "Marcus Lee",
-    title: "Early User & Trader",
-    avatar: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=256&q=80",
+    name: "Shivam Yadav",
+    title: "Contributor at Superteam India",
+    avatar: "https://pbs.twimg.com/profile_images/1970413873917222912/EywkVx5i_400x400.jpg",
   },
   {
     quote:
       "As a creator, I finally get rewarded for posts that go viral. The marketplace feels fast and fair.",
-    name: "Priya Nair",
-    title: "Content Creator",
-    avatar: "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=256&q=80",
+    name: "Shubham Varshney",
+    title: "Full Stack Developer",
+    avatar: "https://pbs.twimg.com/profile_images/1962717533628502016/wzK5bVyR_400x400.jpg",
   },
   {
     quote:
       "Fast, intuitive, and truly innovative. This is the missing link between social and finance.",
-    name: "Diego Morales",
-    title: "Algo Trader",
-    avatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=256&q=80",
+    name: "Sam",
+    title: "Superteam India Member",
+    avatar: "https://pbs.twimg.com/profile_images/1974081302182645760/ZkML0_32_400x400.jpg",
   },
   {
     quote:
       "I love how seamless it is to discover hot posts and back them with real value.",
-    name: "Sara Kim",
-    title: "Community Manager",
-    avatar: "https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?w=256&q=80",
+    name: "Atharva Sachan",
+    title: "Full Stack Developer",
+    avatar: "https://pbs.twimg.com/profile_images/1881399718585999360/QEQGPBu1_400x400.jpg",
   },
 ];
 
