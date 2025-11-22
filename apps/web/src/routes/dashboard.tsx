@@ -35,13 +35,13 @@ function DashboardPage() {
   }, [search.tab]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      // Redirect to sign-in if not authenticated
-      navigate({ 
-        to: "/signin",
-        search: { redirect: "/dashboard" }
-      });
-    }
+    // if (!isLoading && !isAuthenticated) {
+    //   // Redirect to sign-in if not authenticated
+    //   navigate({ 
+    //     to: "/signin",
+    //     search: { redirect: "/dashboard" }
+    //   });
+    // }
   }, [isAuthenticated, isLoading, navigate]);
 
   // Show loading spinner while checking authentication
@@ -57,9 +57,9 @@ function DashboardPage() {
   }
 
   // Don't render dashboard if not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
+  // if (!isAuthenticated) {
+  //   return null;
+  // }
 
   // Map active state to MobileNav page
   const getCurrentPage = (): "feed" | "leaderboard" | "portfolio" | "transactions" | "launch" | "profile" => {

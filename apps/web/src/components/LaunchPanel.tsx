@@ -1,10 +1,9 @@
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { TrendingUp, Coins, Users, Sparkles, ExternalLink, AlertCircle } from "lucide-react";
+import { TrendingUp, Coins, Users, Sparkles, AlertCircle, ArrowRight, Rocket } from "lucide-react";
 import { getApiUrl } from "@/lib/auth";
 
 interface RedditPostPreview {
@@ -23,7 +22,6 @@ interface RedditPostPreview {
 
 export default function LaunchPanel() {
   const { user } = useAuth();
-  const { connected, publicKey } = useWallet();
   const [url, setUrl] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [postPreview, setPostPreview] = useState<RedditPostPreview | null>(null);
@@ -150,294 +148,242 @@ export default function LaunchPanel() {
   };
 
   return (
-    <section className="w-full max-w-5xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-6 sm:mb-8"
-      >
-        <div className="inline-flex items-center gap-2 rounded-full border border-purple-500/40 bg-purple-500/10 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm text-purple-300 mb-4 font-medium">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
-          </span>
-          Turn viral Reddit threads into tradable on-chain assets
-        </div>
-        <h2 className="mb-2 sm:mb-3 text-2xl sm:text-3xl md:text-4xl font-bold text-white flex items-center gap-2 sm:gap-3 font-satoshi">
-          <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-purple-400" />
-          Tokenize a Reddit Post
-        </h2>
-        <p className="text-white/70 text-sm sm:text-base md:text-lg max-w-2xl">
-          Submit a Reddit post URL and create tradable tokens backed by its viral momentum
-        </p>
-      </motion.div>
-
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        {/* Step 1: Fetch Post */}
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
+      {/* Hero Section */}
+      <div className="text-center mb-12">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs font-medium mb-4">
+            <Sparkles className="w-3 h-3" />
+            Tokenize Viral Content
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight font-satoshi">
+            Launch Your Token
+          </h1>
+          <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
+            Turn any Reddit post into a tradable digital asset on Solana.
+            Capture viral momentum and earn rewards.
+          </p>
+        </motion.div>
+      </div>
+
+      <div className="relative">
+        {/* Main Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="rounded-2xl sm:rounded-3xl border border-white/10 bg-black/40 p-4 sm:p-6 backdrop-blur-xl"
+          className="relative z-10 bg-neutral-900/50 border border-white/10 rounded-2xl overflow-hidden"
         >
-          <div className="mb-3 sm:mb-4 flex items-center gap-2">
-            <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-purple-500/20 text-purple-400 text-xs sm:text-sm font-bold">
-              1
-            </div>
-            <h3 className="text-base sm:text-lg font-semibold text-white">Reddit Post URL</h3>
-          </div>
-          
-          <div className="space-y-2 sm:space-y-3">
-            <input
-              required
-              value={url}
-              onChange={(e) => {
-                setUrl(e.target.value);
-                setPostPreview(null);
-                setError("");
-              }}
-              placeholder="https://reddit.com/r/subreddit/comments/..."
-              className="w-full rounded-xl sm:rounded-2xl border border-white/15 bg-white/5 px-3 py-2.5 sm:px-5 sm:py-4 text-sm sm:text-base text-white outline-none placeholder:text-white/40 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all"
-            />
-            
-            <Button
-              type="button"
-              onClick={handleFetchPost}
-              disabled={!url || isFetching}
-              className="w-full sm:w-auto rounded-xl sm:rounded-2xl border border-purple-500/30 bg-purple-500/10 px-4 py-2.5 sm:px-6 sm:py-3 text-sm sm:text-base text-purple-300 hover:bg-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              {isFetching ? (
-                <>
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin mr-1.5 sm:mr-2" />
-                  Fetching...
-                </>
-              ) : (
-                <>
-                  <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-                  Fetch Post Details
-                </>
-              )}
-            </Button>
-          </div>
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-3 sm:mt-4 flex items-start gap-1.5 sm:gap-2 rounded-lg sm:rounded-xl bg-red-500/10 border border-red-500/20 p-2.5 sm:p-3 text-red-400 text-xs sm:text-sm"
-            >
-              <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Step 2: Post Preview */}
-        {postPreview && (
-          <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.4 }}
-            className="rounded-2xl sm:rounded-3xl border border-white/10 bg-black/40 p-4 sm:p-6 backdrop-blur-xl"
-          >
-            <div className="mb-3 sm:mb-4 flex items-center gap-2">
-              <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-blue-500/20 text-blue-400 text-xs sm:text-sm font-bold">
-                2
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white">Post Preview</h3>
-            </div>
-
-            <div className="rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-5 space-y-3 sm:space-y-4">
-              <div className="flex gap-2 sm:gap-4">
-                {postPreview.thumbnail && (
-                  <img
-                    src={postPreview.thumbnail}
-                    alt="Post thumbnail"
-                    className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg sm:rounded-xl object-cover flex-shrink-0"
+          <div className="p-6 sm:p-8 md:p-10">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              
+              {/* URL Input Section */}
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-white/70 ml-1">
+                  Reddit Post URL
+                </label>
+                <div className="flex gap-3">
+                  <input
+                    required
+                    value={url}
+                    onChange={(e) => {
+                      setUrl(e.target.value);
+                      setPostPreview(null);
+                      setError("");
+                    }}
+                    placeholder="Paste Reddit link here..."
+                    className="flex-1 bg-neutral-950/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all"
                   />
+                  <Button
+                    type="button"
+                    onClick={handleFetchPost}
+                    disabled={!url || isFetching}
+                    className="h-auto px-6 rounded-lg bg-white text-black hover:bg-white/90 font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isFetching ? (
+                      <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                    ) : (
+                      <ArrowRight className="w-5 h-5" />
+                    )}
+                  </Button>
+                </div>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 text-red-400 text-sm bg-red-500/5 border border-red-500/10 px-4 py-3 rounded-lg"
+                  >
+                    <AlertCircle className="w-4 h-4" />
+                    {error}
+                  </motion.div>
                 )}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-semibold text-sm sm:text-base md:text-lg mb-1 sm:mb-2 line-clamp-2">
-                    {postPreview.title}
-                  </h4>
-                  <p className="text-white/60 text-xs sm:text-sm mb-2 sm:mb-3">
-                    {postPreview.subreddit} • {postPreview.author}
-                  </p>
-                  <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                    <span className="flex items-center gap-1 text-orange-400">
-                      <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
-                      {postPreview.upvotes.toLocaleString()}
-                    </span>
-                    <span className="flex items-center gap-1 text-blue-400">
-                      <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                      {postPreview.comments}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Step 3: Token Configuration */}
-        {postPreview && (
-          <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="rounded-2xl sm:rounded-3xl border border-white/10 bg-black/40 p-4 sm:p-6 backdrop-blur-xl"
-          >
-            <div className="mb-3 sm:mb-4 flex items-center gap-2">
-              <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-green-500/20 text-green-400 text-xs sm:text-sm font-bold">
-                3
-              </div>
-              <h3 className="text-base sm:text-lg font-semibold text-white">Token Configuration</h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm text-white/70 flex items-center gap-1.5 sm:gap-2">
-                  <Coins className="w-3 h-3 sm:w-4 sm:h-4" />
-                  Initial Supply
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  value={initialSupply}
-                  onChange={(e) => setInitialSupply(e.target.value)}
-                  placeholder="10000"
-                  className="w-full rounded-lg sm:rounded-xl border border-white/15 bg-white/5 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-white outline-none placeholder:text-white/40 focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all"
-                />
-                <p className="mt-1 text-[10px] sm:text-xs text-white/50">Total tokens available</p>
               </div>
 
-              <div>
-                <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm text-white/70 flex items-center gap-1.5 sm:gap-2">
-                  <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
-                  Initial Price (SOL)
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="0.0001"
-                  step="0.0001"
-                  value={initialPrice}
-                  onChange={(e) => setInitialPrice(e.target.value)}
-                  placeholder="0.001"
-                  className="w-full rounded-lg sm:rounded-xl border border-white/15 bg-white/5 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-white outline-none placeholder:text-white/40 focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all"
-                />
-                <p className="mt-1 text-[10px] sm:text-xs text-white/50">Starting price per token</p>
-              </div>
-            </div>
+              <AnimatePresence mode="wait">
+                {postPreview && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="space-y-8 overflow-hidden"
+                  >
+                    <div className="h-px w-full bg-white/5" />
 
-            <div className="mt-3 sm:mt-4">
-              <label className="mb-1.5 sm:mb-2 block text-xs sm:text-sm text-white/70">
-                Description (optional)
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Add context..."
-                rows={3}
-                className="w-full rounded-lg sm:rounded-xl border border-white/15 bg-white/5 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base text-white outline-none placeholder:text-white/40 focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all resize-none"
-              />
-            </div>
+                    {/* Preview Card */}
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-base font-medium text-white/90 mb-4 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">1</span>
+                            Post Preview
+                          </h3>
+                          <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                            <div className="flex gap-4">
+                              {postPreview.thumbnail && (
+                                <img
+                                  src={postPreview.thumbnail}
+                                  alt="Thumbnail"
+                                  className="w-20 h-20 rounded-lg object-cover bg-neutral-800"
+                                />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-white font-medium leading-snug mb-2 line-clamp-2">
+                                  {postPreview.title}
+                                </h4>
+                                <div className="flex items-center gap-3 text-xs text-white/40">
+                                  <span className="font-medium text-white/60">r/{postPreview.subreddit}</span>
+                                  <span>•</span>
+                                  <span>{postPreview.author}</span>
+                                </div>
+                                <div className="mt-3 flex items-center gap-4 text-xs font-medium">
+                                  <span className="flex items-center gap-1.5 text-white/60">
+                                    <TrendingUp className="w-3.5 h-3.5" />
+                                    {postPreview.upvotes.toLocaleString()}
+                                  </span>
+                                  <span className="flex items-center gap-1.5 text-white/60">
+                                    <Users className="w-3.5 h-3.5" />
+                                    {postPreview.comments.toLocaleString()}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-            {/* Token Economics Preview */}
-            <div className="mt-4 sm:mt-6 rounded-xl sm:rounded-2xl border border-green-500/20 bg-green-500/5 p-3 sm:p-4">
-              <h4 className="text-xs sm:text-sm font-semibold text-green-400 mb-2 sm:mb-3">Token Economics</h4>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
-                <div>
-                  <p className="text-white/50 text-[10px] sm:text-xs">Market Cap</p>
-                  <p className="text-white font-semibold text-xs sm:text-sm">
-                    {(parseFloat(initialSupply || "0") * parseFloat(initialPrice || "0")).toFixed(4)} SOL
-                  </p>
-                </div>
-                <div>
-                  <p className="text-white/50 text-[10px] sm:text-xs">Your Wallet</p>
-                  <p className="text-white font-semibold text-xs sm:text-sm truncate">
-                    {connected && publicKey ? `${publicKey.toBase58().substring(0, 4)}...${publicKey.toBase58().substring(publicKey.toBase58().length - 4)}` : "Not connected"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
+                        <div>
+                          <label className="block text-sm font-medium text-white/70 mb-2">
+                            Description
+                          </label>
+                          <textarea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Why should people invest in this post?"
+                            rows={3}
+                            className="w-full bg-neutral-950/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all resize-none text-sm"
+                          />
+                        </div>
+                      </div>
 
-        {/* Submit Button */}
-        {postPreview && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-4"
-          >
-            <Button
-              type="button"
-              onClick={() => {
-                setUrl("");
-                setPostPreview(null);
-                setError("");
-              }}
-              className="rounded-xl sm:rounded-2xl border border-white/20 bg-white/5 px-4 py-3 sm:px-6 sm:py-6 text-sm sm:text-base text-white/70 hover:bg-white/10 transition-all"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-                className="rounded-xl sm:rounded-2xl border border-purple-500/50 bg-gradient-to-r from-purple-500/20 to-blue-500/20 px-6 py-3 sm:px-8 sm:py-6 text-sm sm:text-base text-white font-semibold hover:from-purple-500/30 hover:to-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20 z-10000 cursor-pointer"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-1.5 sm:mr-2" />
-                  Tokenizing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 sm:mr-2" />
-                  Launch Token
-                </>
-              )}
-            </Button>
-          </motion.div>
-        )}
-      </form>
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-base font-medium text-white/90 mb-4 flex items-center gap-2">
+                            <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[10px]">2</span>
+                            Token Economics
+                          </h3>
+                          
+                          <div className="space-y-4">
+                            <div className="bg-black/20 border border-white/5 rounded-xl p-4 space-y-4">
+                              <div>
+                                <label className="block text-xs text-white/40 mb-1.5 uppercase tracking-wider font-medium">
+                                  Initial Supply
+                                </label>
+                                <div className="relative">
+                                  <input
+                                    type="number"
+                                    value={initialSupply}
+                                    onChange={(e) => setInitialSupply(e.target.value)}
+                                    className="w-full bg-transparent border-b border-white/10 py-2 text-white font-mono focus:outline-none focus:border-white/40 transition-all"
+                                  />
+                                  <Coins className="absolute right-0 top-2 w-4 h-4 text-white/20" />
+                                </div>
+                              </div>
 
-      {/* Info Box */}
-      {!postPreview && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-6 sm:mt-8 rounded-xl sm:rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm p-4 sm:p-6"
-        >
-          <h4 className="font-semibold text-blue-300 mb-3 sm:mb-4 text-sm sm:text-base flex items-center gap-2">
-            <span className="text-lg">💡</span> How it works
-          </h4>
-          <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-white/80">
-            <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">→</span>
-              <span>Paste any Reddit post URL to fetch details</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">→</span>
-              <span>Configure token supply and initial pricing</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">→</span>
-              <span>Launch your token and start trading</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-purple-400 mt-0.5">→</span>
-              <span>Earn rewards as curator</span>
-            </li>
-          </ul>
+                              <div>
+                                <label className="block text-xs text-white/40 mb-1.5 uppercase tracking-wider font-medium">
+                                  Initial Price (SOL)
+                                </label>
+                                <div className="relative">
+                                  <input
+                                    type="number"
+                                    value={initialPrice}
+                                    onChange={(e) => setInitialPrice(e.target.value)}
+                                    step="0.0001"
+                                    className="w-full bg-transparent border-b border-white/10 py-2 text-white font-mono focus:outline-none focus:border-white/40 transition-all"
+                                  />
+                                  <TrendingUp className="absolute right-0 top-2 w-4 h-4 text-white/20" />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                              <div className="flex justify-between items-center text-sm mb-2">
+                                <span className="text-white/60">Estimated Market Cap</span>
+                                <span className="text-white font-mono font-medium">
+                                  {(parseFloat(initialSupply || "0") * parseFloat(initialPrice || "0")).toFixed(4)} SOL
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center text-xs text-white/40">
+                                <span>Creator Allocation</span>
+                                <span>100% (Fair Launch)</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-4 flex justify-end gap-3">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() => {
+                          setUrl("");
+                          setPostPreview(null);
+                        }}
+                        className="text-white/60 hover:text-white hover:bg-white/5 rounded-lg"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="bg-white text-black hover:bg-white/90 px-8 py-6 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                            <span>Launching...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Rocket className="w-4 h-4" />
+                            <span>Launch Token</span>
+                          </div>
+                        )}
+                      </Button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </form>
+          </div>
         </motion.div>
-      )}
-    </section>
+      </div>
+    </div>
   );
 }
 
