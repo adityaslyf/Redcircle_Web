@@ -35,13 +35,13 @@ function DashboardPage() {
   }, [search.tab]);
 
   useEffect(() => {
-    // if (!isLoading && !isAuthenticated) {
-    //   // Redirect to sign-in if not authenticated
-    //   navigate({ 
-    //     to: "/signin",
-    //     search: { redirect: "/dashboard" }
-    //   });
-    // }
+    if (!isLoading && !isAuthenticated) {
+      // Redirect to sign-in if not authenticated
+      navigate({ 
+        to: "/signin",
+        search: { redirect: "/dashboard" }
+      });
+    }
   }, [isAuthenticated, isLoading, navigate]);
 
   // Show loading spinner while checking authentication
