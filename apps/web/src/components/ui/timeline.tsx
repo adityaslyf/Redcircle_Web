@@ -3,6 +3,7 @@ import {
   useScroll,
   useTransform,
   motion,
+  useSpring,
 } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -25,11 +26,18 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 10%", "end 50%"],
+    offset: ["start 20%", "end 80%"],
   });
 
   const heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);
   const opacityTransform = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
+  
+  // Add spring physics for smoother line movement
+  const smoothHeight = useSpring(heightTransform, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
   return (
     <div
@@ -76,7 +84,7 @@ export const Timeline = ({ data }: { data: TimelineEntry[] }) => {
         >
           <motion.div
             style={{
-              height: heightTransform,
+              height: smoothHeight,
               opacity: opacityTransform,
             }}
             className="absolute inset-x-0 top-0  w-[2px] bg-gradient-to-t from-red-500 via-orange-500 to-transparent from-[0%] via-[10%] rounded-full"

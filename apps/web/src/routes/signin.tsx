@@ -104,21 +104,21 @@ function SignIn() {
       heroImageSrc="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2832&auto=format&fit=crop"
       testimonials={[
         {
-          avatarSrc: "https://i.pravatar.cc/150?img=1",
-          name: "Sarah Chen",
-          handle: "@sarahc",
+          avatarSrc: "https://pbs.twimg.com/profile_images/1939628385925496832/OEeL3rR1_400x400.jpg",
+          name: "Utkarsh",
+          handle: "@twtutkarsh",
           text: "RedCircle transformed how I monetize my content. The tokenization process is seamless!",
         },
         {
-          avatarSrc: "https://i.pravatar.cc/150?img=2",
-          name: "Marcus Rodriguez",
-          handle: "@marcusr",
+          avatarSrc: "https://pbs.twimg.com/profile_images/1974081302182645760/ZkML0_32_400x400.jpg",
+          name: "Sam",
+          handle: "@BlueCircle0",
           text: "Best trading platform for content creators. The UI is incredibly intuitive.",
         },
         {
-          avatarSrc: "https://i.pravatar.cc/150?img=3",
-          name: "Emily Watson",
-          handle: "@emilyw",
+          avatarSrc: "https://pbs.twimg.com/profile_images/1881399718585999360/QEQGPBu1_400x400.jpg",
+          name: "Atharva",
+          handle: "@atharvaSachan",
           text: "I've been using RedCircle for 6 months. The rewards system is phenomenal!",
         },
       ]}
