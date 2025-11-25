@@ -14,9 +14,11 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// CORS configuration - Allow all origins for development
 app.use(
 	cors({
-		 origin: process.env.FRONTEND_URL || "http://localhost:3001",
+		origin: true, // Allow all origins
 		credentials: true,
 		methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 	}),
