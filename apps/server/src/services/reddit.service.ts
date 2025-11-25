@@ -1,6 +1,6 @@
 /**
  * Reddit API Service
- * Fetches Reddit post data using Reddit's JSON API (no OAuth needed for public posts)
+ * Fetches Reddit post data using Reddit's OAuth API
  */
 
 export interface RedditPost {
@@ -40,11 +40,60 @@ export interface RedditApiResponse {
 
 export class RedditService {
   private static readonly BASE_URL = "https://www.reddit.com";
-  // Updated User-Agent based on Reddit's 2024 requirements
-  // They now block generic bot patterns and require more specific identification
-  // Format: <platform>:<app ID>:<version> (by /u/<reddit username>)
-  // Using a more browser-like User-Agent as a workaround for the strict blocking
+  private static readonly OAUTH_BASE_URL = "https://oauth.reddit.com";
   private static readonly USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+  
+  // OAuth credentials from environment
+  private static readonly CLIENT_ID = process.env.REDDIT_CLIENT_ID;
+  private static readonly CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET;
+  
+  // Cache for OAuth token
+  private static accessToken: string | null = null;
+  private static tokenExpiry: number = 0;
+
+  /**
+   * Get OAuth access token (application-only)
+   */
+  private static async getAccessToken(): Promise<string> {
+    // Return cached token if still valid
+    if (this.accessToken && Date.now() < this.tokenExpiry) {
+      return this.accessToken;
+    }
+
+    if (!this.CLIENT_ID || !this.CLIENT_SECRET) {
+      console.warn("⚠️ Reddit OAuth credentials not configured, falling back to public API");
+      return "";
+    }
+
+    try {
+      const auth = Buffer.from(`${this.CLIENT_ID}:${this.CLIENT_SECRET}`).toString('base64');
+      
+      const response = await fetch('https://www.reddit.com/api/v1/access_token', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': this.USER_AGENT,
+        },
+        body: 'grant_type=client_credentials',
+      });
+
+      if (!response.ok) {
+        throw new Error(`OAuth token request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      this.accessToken = data.access_token;
+      // Set expiry to 50 minutes (tokens last 1 hour, but refresh earlier)
+      this.tokenExpiry = Date.now() + (50 * 60 * 1000);
+      
+      console.log("✅ Reddit OAuth token acquired");
+      return this.accessToken;
+    } catch (error) {
+      console.error("❌ Failed to get Reddit OAuth token:", error);
+      return "";
+    }
+  }
 
   /**
    * Extract Reddit post ID from various URL formats
@@ -81,24 +130,44 @@ export class RedditService {
       throw new Error("Invalid Reddit URL. Please provide a valid Reddit post URL.");
     }
 
-    const apiUrl = this.buildApiUrl(postId);
-    
-    if (!apiUrl) {
-      throw new Error("Failed to build Reddit API URL.");
-    }
-
     console.log(`🔍 Fetching Reddit post: ${postId}`);
 
     try {
-      const response = await fetch(apiUrl, {
-        headers: {
-          "User-Agent": this.USER_AGENT,
-        },
-      });
+      // Try OAuth first if credentials are available
+      const accessToken = await this.getAccessToken();
+      
+      let response;
+      let apiUrl;
+      
+      if (accessToken) {
+        // Use OAuth endpoint
+        apiUrl = `${this.OAUTH_BASE_URL}/comments/${postId}`;
+        console.log(`🔐 Using OAuth API: ${apiUrl}`);
+        
+        response = await fetch(apiUrl, {
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "User-Agent": this.USER_AGENT,
+          },
+        });
+      } else {
+        // Fallback to public JSON API
+        apiUrl = `${this.BASE_URL}/comments/${postId}.json`;
+        console.log(`🌐 Using public API: ${apiUrl}`);
+        
+        response = await fetch(apiUrl, {
+          headers: {
+            "User-Agent": this.USER_AGENT,
+          },
+        });
+      }
 
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error("Reddit post not found. Please check the URL.");
+        }
+        if (response.status === 403) {
+          throw new Error("Access forbidden. Reddit may be blocking requests from this server. Please configure Reddit OAuth credentials.");
         }
         throw new Error(`Reddit API error: ${response.status} ${response.statusText}`);
       }
