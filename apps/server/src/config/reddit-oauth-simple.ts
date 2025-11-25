@@ -14,30 +14,28 @@ const REDDIT_CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET;
 const REDDIT_REDIRECT_URI = process.env.REDDIT_REDIRECT_URI;
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
-// Validate required environment variables
-if (!REDDIT_CLIENT_ID || !REDDIT_CLIENT_SECRET || !REDDIT_REDIRECT_URI || !FRONTEND_URL) {
-  throw new Error(
-    '❌ Missing required environment variables:\n' +
-    (!REDDIT_CLIENT_ID ? '  - REDDIT_CLIENT_ID\n' : '') +
-    (!REDDIT_CLIENT_SECRET ? '  - REDDIT_CLIENT_SECRET\n' : '') +
-    (!REDDIT_REDIRECT_URI ? '  - REDDIT_REDIRECT_URI\n' : '') +
-    (!FRONTEND_URL ? '  - FRONTEND_URL\n' : '') +
-    'Please check your .env file.'
-  );
+// Only validate if we're actually using user authentication routes
+// (Reddit post fetching uses different OAuth flow and doesn't need these)
+const isUserAuthEnabled = REDDIT_REDIRECT_URI && FRONTEND_URL;
+
+if (!isUserAuthEnabled) {
+  console.warn('⚠️ Reddit user authentication disabled. Set REDDIT_REDIRECT_URI and FRONTEND_URL to enable.');
 }
 
-// Step 1: Redirect to Reddit
-router.get("/auth/reddit", (_req, res) => {
-  const state = Math.random().toString(36).substring(7);
-  // URL encode the redirect_uri to handle special characters
-  const encodedRedirectUri = encodeURIComponent(REDDIT_REDIRECT_URI);
-  const authUrl = `https://www.reddit.com/api/v1/authorize?client_id=${REDDIT_CLIENT_ID}&response_type=code&state=${state}&redirect_uri=${encodedRedirectUri}&duration=permanent&scope=identity`;
-  console.log("🔴 Redirecting to Reddit OAuth:", authUrl);
-  res.redirect(authUrl);
-});
+// Only enable routes if user auth is configured
+if (isUserAuthEnabled && REDDIT_CLIENT_ID && REDDIT_CLIENT_SECRET && REDDIT_REDIRECT_URI && FRONTEND_URL) {
+  // Step 1: Redirect to Reddit
+  router.get("/auth/reddit", (_req, res) => {
+    const state = Math.random().toString(36).substring(7);
+    // URL encode the redirect_uri to handle special characters
+    const encodedRedirectUri = encodeURIComponent(REDDIT_REDIRECT_URI);
+    const authUrl = `https://www.reddit.com/api/v1/authorize?client_id=${REDDIT_CLIENT_ID}&response_type=code&state=${state}&redirect_uri=${encodedRedirectUri}&duration=permanent&scope=identity`;
+    console.log("🔴 Redirecting to Reddit OAuth:", authUrl);
+    res.redirect(authUrl);
+  });
 
-// Step 2: Handle callback from Reddit
-router.get("/auth/reddit/callback", async (req, res) => {
+  // Step 2: Handle callback from Reddit
+  router.get("/auth/reddit/callback", async (req, res) => {
   const { code, error } = req.query;
 
   if (error) {
@@ -124,6 +122,9 @@ router.get("/auth/reddit/callback", async (req, res) => {
     res.redirect(`${FRONTEND_URL}/signin?error=auth_failed`);
   }
 });
+} else {
+  console.log('ℹ️ Reddit user authentication routes disabled');
+}
 
 export default router;
 
