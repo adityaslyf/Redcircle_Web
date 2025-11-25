@@ -40,7 +40,9 @@ export interface RedditApiResponse {
 
 export class RedditService {
   private static readonly BASE_URL = "https://www.reddit.com";
-  private static readonly USER_AGENT = "RedCircle/1.0 (Post Tokenization Platform)";
+  // Updated User-Agent to comply with Reddit API rules
+  // Format: <platform>:<app ID>:<version string> (by /u/<reddit username>)
+  private static readonly USER_AGENT = "web:com.redcircle.app:v1.0.0 (by /u/RedCircleBot)";
 
   /**
    * Extract Reddit post ID from various URL formats
