@@ -32,7 +32,7 @@ export default function DesktopSidebar({ currentPage, onNavigate }: DesktopSideb
               key={item.key}
               onClick={() => onNavigate(item.key)}
               className={
-                "rounded-lg md:rounded-xl border px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm transition-all duration-200 flex items-center gap-2 " +
+                "rounded-lg md:rounded-xl border px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm transition-all duration-200 flex items-center gap-2 cursor-pointer" +
                 (isActive
                   ? "border-white/20 bg-white/15 text-white shadow-lg shadow-white/5"
                   : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10")

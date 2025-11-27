@@ -167,7 +167,7 @@ function TransactionsPage() {
               <button
                 onClick={() => setFilterType("all")}
                 className={cn(
-                  "rounded-xl px-4 py-2 text-sm transition-all",
+                  "rounded-xl px-4 py-2 text-sm transition-all cursor-pointer",
                   filterType === "all"
                     ? "bg-white/15 text-white"
                     : "text-white/60 hover:text-white"
@@ -178,7 +178,7 @@ function TransactionsPage() {
               <button
                 onClick={() => setFilterType("buy")}
                 className={cn(
-                  "rounded-xl px-4 py-2 text-sm transition-all",
+                  "rounded-xl px-4 py-2 text-sm transition-all cursor-pointer",
                   filterType === "buy"
                     ? "bg-green-500/20 text-green-400"
                     : "text-white/60 hover:text-white"

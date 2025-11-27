@@ -15,26 +15,6 @@ const items = [
 		ariaLabel: "Open dashboard",
 	},
 	{
-		label: "Features",
-		link: "#features",
-		ariaLabel: "View features",
-	},
-	{
-		label: "About",
-		link: "#about",
-		ariaLabel: "Learn about us",
-	},
-	{
-		label: "Pricing",
-		link: "#pricing",
-		ariaLabel: "View pricing",
-	},
-	{
-		label: "Contact",
-		link: "#contact",
-		ariaLabel: "Contact us",
-	},
-	{
 		label: "Sign In",
 		link: "/signin",
 		ariaLabel: "Sign in to your account",
@@ -93,21 +73,6 @@ export default function Navbar() {
 					link: "/dashboard?tab=profile",
 					ariaLabel: "View your profile",
 				},
-				{
-					label: "Features",
-					link: "#features",
-					ariaLabel: "View features",
-				},
-				{
-					label: "About",
-					link: "#about",
-					ariaLabel: "Learn about us",
-				},
-				{
-					label: "Contact",
-					link: "#contact",
-					ariaLabel: "Contact us",
-				},
 		  ]
 		: items;
 
@@ -133,7 +98,7 @@ export default function Navbar() {
 					</span>
 				}
 				menuPanelHeader={
-					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full">
+					<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full z-10000">
 					{isAuthenticated && <UserProfile />}
 						<WalletButton />
 					</div>

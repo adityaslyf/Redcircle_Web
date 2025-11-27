@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import { RefreshCw } from "lucide-react";
 import FeedCard, { type FeedPost } from "@/components/FeedCard";
@@ -6,15 +6,6 @@ import TradingModal from "@/components/TradingModal";
 import SearchBar, { type SearchFilters } from "@/components/SearchBar";
 import { getApiUrl } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-
-type TabKey = "all" | "trending" | "new" | "terminal";
-
-const TABS: { key: TabKey; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "trending", label: "Trending" },
-  { key: "new", label: "New" },
-  { key: "terminal", label: "Terminal" },
-];
 
 // Backend post type (matches database schema)
 type BackendPost = {
@@ -35,7 +26,6 @@ type BackendPost = {
 };
 
 export default function RedditFeed({ sideFilters = false }: { sideFilters?: boolean }) {
-  const [active, setActive] = useState<TabKey>("all");
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -140,7 +130,7 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
         setLoading(false);
         setIsRefreshing(false);
       }
-    }, []); // Remove offset from dependencies
+    }, []);
 
   // Load more posts
   const loadMorePosts = useCallback(async () => {
@@ -191,21 +181,8 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
     return () => window.removeEventListener('scroll', handleScroll);
   }, [hasMore, loadingMore, loadMorePosts]);
 
-  const filtered = useMemo(() => {
-    switch (active) {
-      case "trending":
-        return posts.filter((p) => p.isTrending || (p.upvotes ?? 0) > 10000);
-      case "new":
-        return [...posts].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-        );
-      case "terminal":
-        // Placeholder: In future, filter posts tagged as terminal/tradable-only
-        return posts.slice(0, Math.max(1, Math.floor(posts.length / 2)));
-      default:
-        return posts;
-    }
-  }, [active, posts]);
+  // No tab filtering anymore: just use all posts
+  const filtered = posts;
 
   const handleTrade = (post: FeedPost) => {
     setSelectedPost(post);
@@ -215,160 +192,106 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
   return (
     <>
       <section id="feed" className="relative mx-auto w-full max-w-6xl">
-      {/* Container with flex to reorder on mobile */}
-      <div className="flex flex-col">
-        {/* Dashboard Section - Order 1 on mobile, 2 on desktop */}
-        {sideFilters ? (
-          <>
-            {/* Desktop side filter */}
-            <aside className="fixed right-2 md:right-4 lg:right-6 top-1/2 z-40 hidden -translate-y-1/2 flex-col gap-1.5 md:gap-2 md:flex">
-              <h3 className="mb-1.5 md:mb-2 pl-1 text-[10px] md:text-xs uppercase tracking-wider text-white/50">Feed</h3>
-              {TABS.map((t) => {
-                const isActive = active === t.key;
-                return (
-                  <button
-                    key={t.key}
-                    onClick={() => setActive(t.key)}
-                    className={
-                      "rounded-lg md:rounded-xl border px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm transition-all duration-200 " +
-                      (isActive
-                        ? "border-white/20 bg-white/15 text-white shadow-lg shadow-white/5"
-                        : "border-white/10 bg-white/5 text-white/70 hover:bg-white/10")
-                    }
-                  >
-                    {t.label}
-                  </button>
-                );
-              })}
-            </aside>
-          </>
-        ) : (
+        {/* Container with flex to reorder on mobile */}
+        <div className="flex flex-col">
+          {/* Dashboard Section - Order 1 on mobile, 2 on desktop */}
           <div className="z-40 mb-6 order-1 sm:order-2">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <motion.h2
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4 }}
-              className="text-2xl sm:text-3xl font-bold text-white tracking-tight"
-            >
-              Feed
-            </motion.h2>
-            <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto scrollbar-hide">
-              {/* Refresh Button */}
-              <Button
-                onClick={handleRefresh}
-                disabled={isRefreshing || loading}
-                variant="ghost"
-                size="sm"
-                className="h-9 px-3 rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50 flex-shrink-0 transition-all"
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <motion.h2
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
+                className="text-2xl sm:text-3xl font-bold text-white tracking-tight"
               >
-                <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              </Button>
-              
-              {/* Tabs */}
-              <nav className="relative flex-1 sm:flex-none">
-                <ul className="flex gap-1 rounded-full border border-white/10 bg-white/5 p-1">
-                  {TABS.map((t) => {
-                    const isActive = active === t.key;
-                    return (
-                      <li key={t.key}>
-                        <button
-                          onClick={() => setActive(t.key)}
-                          className={
-                            "relative rounded-full px-4 py-1.5 text-xs sm:text-sm font-medium transition-all whitespace-nowrap " +
-                            (isActive ? "text-white" : "text-white/50 hover:text-white/80")
-                          }
-                        >
-                          {t.label}
-                          {isActive && (
-                            <motion.span
-                              layoutId="tab-bg"
-                              className="absolute inset-0 -z-10 rounded-full bg-white/10 border border-white/10 shadow-sm"
-                              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            />
-                          )}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-            </div>
-          </div>
-        </div>
-        )}
-
-        {/* Search Bar - Order 2 on mobile, 1 on desktop */}
-        <div className="mb-4 sm:mb-8 order-2 sm:order-1">
-          <SearchBar onSearch={handleSearch} showFilters={true} />
-        </div>
-      </div>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="h-80 sm:h-96 animate-pulse rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5"
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Error State */}
-      {error && !loading && posts.length === 0 && (
-        <div className="rounded-2xl sm:rounded-3xl border border-red-500/20 bg-red-500/5 p-6 sm:p-8 text-center">
-          <p className="text-sm sm:text-base text-red-400">⚠️ {error}</p>
-          <button
-            onClick={handleRefresh}
-            className="mt-4 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 px-4 sm:px-6 py-2 text-xs sm:text-sm text-white transition-colors hover:bg-white/10"
-          >
-            Try Again
-          </button>
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!loading && !error && posts.length === 0 && (
-        <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-8 sm:p-12 text-center">
-          <p className="text-lg sm:text-xl text-white/70">📭 No tokenized posts yet</p>
-          <p className="mt-2 text-xs sm:text-sm text-white/50">
-            Be the first to tokenize a Reddit post!
-          </p>
-        </div>
-      )}
-
-      {/* Posts Grid */}
-      {!loading && filtered.length > 0 && (
-        <>
-          <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((post) => (
-              <FeedCard key={post.id} post={post} onTrade={handleTrade} />
-            ))}
-          </div>
-
-          {/* Load More Indicator */}
-          {loadingMore && (
-            <div className="mt-6 sm:mt-8 flex justify-center">
-              <div className="flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 px-4 sm:px-6 py-2 sm:py-3">
-                <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
-                <span className="text-xs sm:text-sm text-white/70">Loading more posts...</span>
+                Feed
+              </motion.h2>
+              <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto scrollbar-hide">
+                {/* Refresh Button */}
+                <Button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing || loading}
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 px-3 rounded-full border border-white/10 bg-white/5 text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50 flex-shrink-0 transition-all"
+                >
+                  <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                </Button>
+                {/* Tabs removed */}
               </div>
             </div>
-          )}
+          </div>
 
-          {/* End of Results */}
-          {!hasMore && !loadingMore && (
-            <div className="mt-6 sm:mt-8 text-center">
-              <p className="text-xs sm:text-sm text-white/50">
-                🎉 You've reached the end! No more posts to load.
-              </p>
+          {/* Search Bar - Order 2 on mobile, 1 on desktop */}
+          <div className="mb-4 sm:mb-8 order-2 sm:order-1">
+            <SearchBar onSearch={handleSearch} showFilters={true} />
+          </div>
+        </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="h-80 sm:h-96 animate-pulse rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5"
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && posts.length === 0 && (
+          <div className="rounded-2xl sm:rounded-3xl border border-red-500/20 bg-red-500/5 p-6 sm:p-8 text-center">
+            <p className="text-sm sm:text-base text-red-400">⚠️ {error}</p>
+            <button
+              onClick={handleRefresh}
+              className="mt-4 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 px-4 sm:px-6 py-2 text-xs sm:text-sm text-white transition-colors hover:bg-white/10"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && posts.length === 0 && (
+          <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/5 p-8 sm:p-12 text-center">
+            <p className="text-lg sm:text-xl text-white/70">📭 No tokenized posts yet</p>
+            <p className="mt-2 text-xs sm:text-sm text-white/50">
+              Be the first to tokenize a Reddit post!
+            </p>
+          </div>
+        )}
+
+        {/* Posts Grid */}
+        {!loading && filtered.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((post) => (
+                <FeedCard key={post.id} post={post} onTrade={handleTrade} />
+              ))}
             </div>
-          )}
-        </>
-      )}
+
+            {/* Load More Indicator */}
+            {loadingMore && (
+              <div className="mt-6 sm:mt-8 flex justify-center">
+                <div className="flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-white/10 bg-white/5 px-4 sm:px-6 py-2 sm:py-3">
+                  <div className="h-4 w-4 sm:h-5 sm:w-5 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
+                  <span className="text-xs sm:text-sm text-white/70">Loading more posts...</span>
+                </div>
+              </div>
+            )}
+
+            {/* End of Results */}
+            {!hasMore && !loadingMore && (
+              <div className="mt-6 sm:mt-8 text-center">
+                <p className="text-xs sm:text-sm text-white/50">
+                  🎉 You've reached the end! No more posts to load.
+                </p>
+              </div>
+            )}
+          </>
+        )}
       </section>
 
       {/* Trading Modal */}
@@ -385,5 +308,3 @@ export default function RedditFeed({ sideFilters = false }: { sideFilters?: bool
     </>
   );
 }
-
-
