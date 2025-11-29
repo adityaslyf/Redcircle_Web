@@ -10,6 +10,7 @@ import {
   getOrCreateAssociatedTokenAccount,
 } from '@solana/spl-token';
 import bs58 from 'bs58';
+import { createDBCPool, type CreateDBCPoolParams } from './dbc.service.js';
 
 /**
  * Token Service for creating SPL tokens on Solana
@@ -62,6 +63,9 @@ export type TokenMintResult = {
   signature: string;
   decimals: number;
   explorerUrl: string;
+  dbcPoolAddress?: string;
+  dbcConfigAddress?: string;
+  dbcInitialPrice?: number;
 };
 
 /**
@@ -129,6 +133,32 @@ export async function createPostToken(params: CreateTokenParams): Promise<TokenM
     console.log(`✅ Minted ${params.tokenSupply} tokens`);
     console.log(`📝 Transaction signature: ${signature}`);
 
+    // Step 4: Create DBC pool for decentralized trading
+    console.log('\n⏳ Step 4: Creating DBC pool...');
+    let dbcPoolData;
+    try {
+      // Calculate market caps (using initial price from params if available)
+      // For now, we'll use a default initial market cap based on supply
+      const initialMarketCap = 1; // 1 SOL initial market cap
+      const migrationMarketCap = 100; // 100 SOL migration market cap (10x growth)
+      
+      const dbcParams: CreateDBCPoolParams = {
+        baseMint: mintAddress,
+        tokenSupply: params.tokenSupply,
+        initialMarketCap,
+        migrationMarketCap,
+        tokenDecimals: params.decimals,
+        creator: authorityKeypair.publicKey,
+      };
+
+      dbcPoolData = await createDBCPool(dbcParams, authorityKeypair);
+      console.log(`✅ DBC pool created: ${dbcPoolData.poolAddress}`);
+    } catch (dbcError) {
+      console.error('⚠️  Failed to create DBC pool:', dbcError);
+      // Don't fail the entire token creation if DBC pool creation fails
+      // The pool can be created later
+    }
+
     // Determine network for explorer URL
     const network = getRpcUrl().includes('devnet') ? 'devnet' : 'mainnet';
     const explorerUrl = `https://solscan.io/token/${mintAddress.toBase58()}?cluster=${network}`;
@@ -141,6 +171,9 @@ export async function createPostToken(params: CreateTokenParams): Promise<TokenM
       signature,
       decimals: params.decimals,
       explorerUrl,
+      dbcPoolAddress: dbcPoolData?.poolAddress,
+      dbcConfigAddress: dbcPoolData?.configAddress,
+      dbcInitialPrice: dbcPoolData?.initialPrice,
     };
   } catch (error) {
     console.error('\n❌ Error creating token:', error);

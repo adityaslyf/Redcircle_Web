@@ -11,31 +11,33 @@ const router = Router();
 
 /**
  * POST /api/trading/buy
- * Buy tokens from a post's bonding curve
+ * Buy tokens from a post's DBC pool
+ * Body: { postId, amountInSOL, walletAddress }
+ * - amountInSOL: Amount of SOL to spend (not token amount)
  */
 router.post("/buy", authenticateToken, async (req, res) => {
   try {
-    const { postId, amount, walletAddress } = req.body;
+    const { postId, amountInSOL, walletAddress } = req.body;
 
     // Validation
-    if (!postId || !amount || !walletAddress) {
+    if (!postId || !amountInSOL || !walletAddress) {
       return res.status(400).json({
-        error: "Missing required fields: postId, amount, walletAddress",
+        error: "Missing required fields: postId, amountInSOL, walletAddress",
       });
     }
 
-    if (amount <= 0) {
+    if (amountInSOL <= 0) {
       return res.status(400).json({
         error: "Amount must be greater than 0",
       });
     }
 
-    console.log(`\n🛒 Buy request: ${amount} tokens for post ${postId}`);
+    console.log(`\n🛒 Buy request: ${amountInSOL} SOL for post ${postId}`);
 
     const result = await buyTokens({
       postId,
       buyerWalletAddress: walletAddress,
-      amount: parseInt(amount),
+      amountInSOL: parseFloat(amountInSOL),
     });
 
     res.json({

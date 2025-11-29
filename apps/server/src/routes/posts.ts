@@ -152,6 +152,9 @@ router.post("/tokenize", async (req, res) => {
       console.log("✅ Token successfully minted on blockchain!");
       console.log(`   Mint Address: ${tokenMintData.mintAddress}`);
       console.log(`   Explorer: ${tokenMintData.explorerUrl}`);
+      if (tokenMintData.dbcPoolAddress) {
+        console.log(`   DBC Pool: ${tokenMintData.dbcPoolAddress}`);
+      }
     } catch (mintError) {
       console.error("❌ Failed to mint token on blockchain:", mintError);
       
@@ -183,6 +186,8 @@ router.post("/tokenize", async (req, res) => {
         tokenSymbol,
         tokenDecimals: tokenMintData.decimals,
         tokenMintAddress: tokenMintData.mintAddress, // ← Blockchain address
+        dbcPoolAddress: tokenMintData.dbcPoolAddress || null, // ← DBC pool address
+        dbcConfigAddress: tokenMintData.dbcConfigAddress || null, // ← DBC config address
         status: "active", // ← Token is minted and active!
         totalVolume: "0",
         marketCap,
