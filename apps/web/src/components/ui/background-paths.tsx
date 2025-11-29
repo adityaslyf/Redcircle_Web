@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-
+import { useNavigate } from '@tanstack/react-router';
 const RedditIcon = () => (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
@@ -92,9 +92,14 @@ export function BackgroundPaths({
 	subtitle?: string;
 }) {
 	const words = title.split(" ");
+	const navigate = useNavigate();
+
+	const handleStartTrading = () => {
+		navigate({ to: "/launch" });
+	};
 
 	return (
-		<div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-neutral-50 dark:bg-neutral-950 selection:bg-orange-500/30">
+		<div className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-neutral-50 dark:bg-black :bg-orange-500/30">
 			<div className="absolute inset-0 h-full w-full">
 				<AnimatedBackground />
 			</div>
@@ -231,7 +236,8 @@ export function BackgroundPaths({
 							className="rounded-full px-8 py-6 text-lg font-medium 
                             bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 
                             text-white dark:text-black transition-all duration-300 
-                            hover:scale-105 hover:shadow-lg hover:shadow-neutral-500/20"
+                            hover:scale-105 hover:shadow-lg hover:shadow-neutral-500/20 cursor-pointer"
+							onClick={handleStartTrading}
 						>
 							Start Trading Now
 						</Button>
