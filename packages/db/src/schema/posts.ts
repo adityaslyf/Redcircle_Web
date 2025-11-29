@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, integer, numeric, uuid, pgEnum } from "drizzle-orm/pg-core";
-import { users } from "./users.js";
+import { users } from "./users";
 
 // Enum for tokenization status
 export const tokenizationStatusEnum = pgEnum("tokenization_status", [
@@ -37,6 +37,8 @@ export const posts = pgTable("posts", {
   tokenMintAddress: text("token_mint_address").unique(), // Solana token mint address
   tokenSymbol: text("token_symbol"), // e.g., "POST123"
   tokenDecimals: integer("token_decimals").default(9), // Standard SPL token decimals
+  dbcPoolAddress: text("dbc_pool_address").unique(), // Meteora DBC pool address
+  dbcConfigAddress: text("dbc_config_address"), // Meteora DBC config address
   
   // Tokenization Status
   status: tokenizationStatusEnum("status").default("pending").notNull(),

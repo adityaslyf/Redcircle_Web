@@ -29,6 +29,13 @@
       "when": 1763065881537,
       "tag": "0003_rich_ser_duncan",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1764411018779,
+      "tag": "0004_curly_sentinel",
+      "breakpoints": true
     }
   ]
 }
