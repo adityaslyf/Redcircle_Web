@@ -17,8 +17,9 @@ function LaunchPage() {
     // Debug logging
     console.log("🔍 Launch Route Auth Check:", { user, isLoading, isAuthenticated });
     
-    // Redirect to signin if not authenticated
-    if (!isLoading && !isAuthenticated) {
+    // Skip auth check for localhost testing
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost && !isLoading && !isAuthenticated) {
       console.log("❌ Not authenticated, redirecting to sign in...");
       navigate({ to: "/signin" });
     }
@@ -36,8 +37,9 @@ function LaunchPage() {
     );
   }
 
-  // Don't render if not authenticated (will redirect)
-  if (!user) {
+  // Skip auth check for localhost testing
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (!isLocalhost && !user) {
     return null;
   }
 

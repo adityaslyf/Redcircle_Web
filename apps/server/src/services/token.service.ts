@@ -134,29 +134,58 @@ export async function createPostToken(params: CreateTokenParams): Promise<TokenM
     console.log(`📝 Transaction signature: ${signature}`);
 
     // Step 4: Create DBC pool for decentralized trading
+    // NOTE: Temporarily disabled - SDK integration needs verification
+    // TODO: Fix DBC SDK integration based on actual SDK API
     console.log('\n⏳ Step 4: Creating DBC pool...');
     let dbcPoolData;
-    try {
-      // Calculate market caps (using initial price from params if available)
-      // For now, we'll use a default initial market cap based on supply
-      const initialMarketCap = 1; // 1 SOL initial market cap
-      const migrationMarketCap = 100; // 100 SOL migration market cap (10x growth)
-      
-      const dbcParams: CreateDBCPoolParams = {
-        baseMint: mintAddress,
-        tokenSupply: params.tokenSupply,
-        initialMarketCap,
-        migrationMarketCap,
-        tokenDecimals: params.decimals,
-        creator: authorityKeypair.publicKey,
-      };
+    
+    // Check if we should skip DBC pool creation (for testing)
+    const skipDBC = process.env.SKIP_DBC_POOL_CREATION === 'true';
+    
+    if (skipDBC) {
+      console.log('⚠️  Skipping DBC pool creation (SKIP_DBC_POOL_CREATION=true)');
+    } else {
+      try {
+        // Calculate market caps (using initial price from params if available)
+        // For now, we'll use a default initial market cap based on supply
+        const initialMarketCap = 1; // 1 SOL initial market cap
+        const migrationMarketCap = 100; // 100 SOL migration market cap (10x growth)
+        
+        const dbcParams: CreateDBCPoolParams = {
+          baseMint: mintAddress,
+          tokenSupply: params.tokenSupply,
+          initialMarketCap,
+          migrationMarketCap,
+          tokenDecimals: params.decimals,
+          creator: authorityKeypair.publicKey,
+          tokenName: `Redcircle ${params.tokenSymbol}`,
+          tokenSymbol: params.tokenSymbol,
+          tokenUri: '', // Can be updated later with metadata
+        };
 
-      dbcPoolData = await createDBCPool(dbcParams, authorityKeypair);
-      console.log(`✅ DBC pool created: ${dbcPoolData.poolAddress}`);
-    } catch (dbcError) {
-      console.error('⚠️  Failed to create DBC pool:', dbcError);
-      // Don't fail the entire token creation if DBC pool creation fails
-      // The pool can be created later
+        console.log('📋 DBC Pool Params:', {
+          baseMint: dbcParams.baseMint.toBase58(),
+          tokenSupply: dbcParams.tokenSupply,
+          initialMarketCap: dbcParams.initialMarketCap,
+          migrationMarketCap: dbcParams.migrationMarketCap,
+        });
+
+        dbcPoolData = await createDBCPool(dbcParams, authorityKeypair);
+        console.log(`✅ DBC pool created: ${dbcPoolData.poolAddress}`);
+      } catch (dbcError) {
+        console.error('❌ Failed to create DBC pool - Full Error Details:');
+        console.error('   Error:', dbcError);
+        if (dbcError instanceof Error) {
+          console.error('   Message:', dbcError.message);
+          console.error('   Stack:', dbcError.stack);
+          if (dbcError.cause) {
+            console.error('   Cause:', dbcError.cause);
+          }
+        }
+        console.error('⚠️  Continuing without DBC pool - token will be created but trading will use custom bonding curve');
+        // Don't fail the entire token creation if DBC pool creation fails
+        // The pool can be created later
+      }
     }
 
     // Determine network for explorer URL

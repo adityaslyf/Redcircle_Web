@@ -110,16 +110,89 @@ export async function createDBCPool(
 
     // Build curve config using helper function
     const tokenDecimals = params.tokenDecimals || 9;
-    const curveConfig = buildCurveWithMarketCap({
-      totalTokenSupply: new BN(params.tokenSupply * Math.pow(10, tokenDecimals)),
-      initialMarketCap: new BN(params.initialMarketCap * LAMPORTS_PER_SOL),
-      migrationMarketCap: new BN(params.migrationMarketCap * LAMPORTS_PER_SOL),
-      migrationOption: MigrationOption.MET_DAMM_V2, // Migrate to DAMM v2 after graduation
-      tokenBaseDecimal: tokenDecimals === 6 ? TokenDecimal.SIX : TokenDecimal.NINE,
-      tokenQuoteDecimal: TokenDecimal.NINE, // SOL has 9 decimals
-    });
-
-    console.log('✅ Curve config built');
+    let curveConfig;
+    try {
+      console.log('🔧 Attempting to build curve config...');
+      console.log('   Available exports from SDK:', Object.keys(await import('@meteora-ag/dynamic-bonding-curve-sdk')));
+      
+      // Build curve config with all required parameters
+      const curveParams: any = {
+        totalTokenSupply: new BN(params.tokenSupply * Math.pow(10, tokenDecimals)),
+        initialMarketCap: new BN(params.initialMarketCap * LAMPORTS_PER_SOL),
+        migrationMarketCap: new BN(params.migrationMarketCap * LAMPORTS_PER_SOL),
+        migrationOption: MigrationOption.MET_DAMM_V2,
+        tokenBaseDecimal: tokenDecimals === 6 ? TokenDecimal.SIX : TokenDecimal.NINE,
+        tokenQuoteDecimal: TokenDecimal.NINE,
+        // Required: migrationFee (must be provided, not undefined)
+        migrationFee: {
+          feePercentage: 0,
+          creatorFeePercentage: 0,
+        },
+        // Required: leftover (must be string decimal for SDK's Decimal conversion)
+        leftover: "0.0", // No leftover tokens - string format for Decimal.js
+        // Required: lockedVestingParam (no vesting for now)
+        lockedVestingParam: {
+          totalLockedVestingAmount: new BN(0),
+          numberOfVestingPeriod: 0,
+          cliffUnlockAmount: new BN(0),
+          totalVestingDuration: 0,
+          cliffDurationFromMigrationTime: 0,
+        },
+        // Required: baseFeeParams (default fees)
+        baseFeeParams: {
+          baseFeeMode: 0, // Fixed fee mode
+          cliffFeeNumerator: new BN(10000000), // 1% fee (100 bps = 10000000 / 1000000000)
+          firstFactor: 0,
+          secondFactor: new BN(0),
+          thirdFactor: new BN(0),
+        },
+        // Required: dynamicFeeParams (disabled for now)
+        dynamicFeeEnabled: false,
+        dynamicFeeParams: {
+          binStep: 1,
+          binStepU128: new BN(1844674407370955),
+          filterPeriod: 10,
+          decayPeriod: 120,
+          reductionFactor: 5000,
+          maxVolatilityAccumulator: 14460000,
+          variableFeeControl: 956,
+        },
+        // Required: activation and fee settings
+        activationType: 1, // ActivationType.Immediate
+        collectFeeMode: 0, // CollectFeeMode.QuoteToken
+        creatorTradingFeePercentage: 0, // No creator fee
+        migratedPoolFee: {
+          collectFeeMode: 0,
+          dynamicFee: 0,
+          poolFeeBps: 100, // 1% pool fee after migration
+        },
+      };
+      
+      console.log('   Curve params:', {
+        totalTokenSupply: curveParams.totalTokenSupply.toString(),
+        initialMarketCap: curveParams.initialMarketCap.toString(),
+        migrationMarketCap: curveParams.migrationMarketCap.toString(),
+        leftover: curveParams.leftover?.toString() || 'undefined',
+        leftoverType: typeof curveParams.leftover,
+      });
+      
+      curveConfig = buildCurveWithMarketCap(curveParams);
+      console.log('✅ Curve config built successfully');
+    } catch (curveError) {
+      console.error('❌ Error building curve config:');
+      console.error('   Error type:', curveError?.constructor?.name);
+      console.error('   Error message:', curveError instanceof Error ? curveError.message : String(curveError));
+      console.error('   Full error:', curveError);
+      
+      // Log function signature if available
+      try {
+        console.error('   buildCurveWithMarketCap function:', buildCurveWithMarketCap.toString().substring(0, 200));
+      } catch (e) {
+        // Ignore
+      }
+      
+      throw new Error(`Failed to build curve config: ${curveError instanceof Error ? curveError.message : 'Unknown error'}`);
+    }
 
     // Generate config keypair
     const configKeypair = Keypair.generate();
@@ -128,14 +201,34 @@ export async function createDBCPool(
     console.log(`📝 Config Address: ${configAddress.toBase58()}`);
 
     // Create config transaction
-    const createConfigTx = await dbcClient.pool.createConfig({
-      config: configAddress,
-      feeClaimer: feeClaimer.publicKey,
-      leftoverReceiver: leftoverReceiver.publicKey,
-      quoteMint,
-      payer: payer.publicKey,
-      curveConfig,
-    });
+    let createConfigTx;
+    try {
+      // Try the pool.createConfig method
+      if (typeof dbcClient.pool.createConfig === 'function') {
+        createConfigTx = await dbcClient.pool.createConfig({
+          config: configAddress,
+          feeClaimer: feeClaimer.publicKey,
+          leftoverReceiver: leftoverReceiver.publicKey,
+          quoteMint,
+          payer: payer.publicKey,
+          curveConfig,
+        });
+      } else {
+        // Fallback: try direct createConfig method
+        createConfigTx = await dbcClient.createConfig({
+          config: configAddress,
+          feeClaimer: feeClaimer.publicKey,
+          leftoverReceiver: leftoverReceiver.publicKey,
+          quoteMint,
+          payer: payer.publicKey,
+          curveConfig,
+        });
+      }
+    } catch (configError) {
+      console.error('❌ Error creating config transaction:', configError);
+      console.error('   Available methods on dbcClient.pool:', Object.keys(dbcClient.pool || {}));
+      throw new Error(`Failed to create config transaction: ${configError instanceof Error ? configError.message : 'Unknown error'}`);
+    }
 
     // Sign and send config transaction
     createConfigTx.sign(configKeypair, payer);
@@ -153,17 +246,29 @@ export async function createDBCPool(
     const poolAddress = poolKeypair.publicKey;
 
     // Create pool transaction
-    const createPoolTx = await dbcClient.pool.createPool({
-      pool: poolAddress,
-      baseMint: params.baseMint,
-      quoteMint,
-      config: configAddress,
-      creator: params.creator || payer.publicKey,
-      payer: payer.publicKey,
-      name: params.tokenName || 'Redcircle Token',
-      symbol: params.tokenSymbol || 'RCT',
-      uri: params.tokenUri || '',
-    });
+    let createPoolTx;
+    try {
+      // Try the pool.createPool method
+      if (typeof dbcClient.pool.createPool === 'function') {
+        createPoolTx = await dbcClient.pool.createPool({
+          pool: poolAddress,
+          baseMint: params.baseMint,
+          quoteMint,
+          config: configAddress,
+          creator: params.creator || payer.publicKey,
+          payer: payer.publicKey,
+          name: params.tokenName || 'Redcircle Token',
+          symbol: params.tokenSymbol || 'RCT',
+          uri: params.tokenUri || '',
+        });
+      } else {
+        throw new Error('dbcClient.pool.createPool method not found. Check SDK documentation.');
+      }
+    } catch (poolError) {
+      console.error('❌ Error creating pool transaction:', poolError);
+      console.error('   Available methods on dbcClient.pool:', Object.keys(dbcClient.pool || {}));
+      throw new Error(`Failed to create pool transaction: ${poolError instanceof Error ? poolError.message : 'Unknown error'}`);
+    }
 
     // Sign and send pool transaction
     createPoolTx.sign(poolKeypair, payer);
