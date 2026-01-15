@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { RedditService } from "../services/reddit.service";
 import { createPostToken } from "../services/token.service";
-import { db } from "@Redcircle/db";
-import * as schema from "@Redcircle/db";
+import { db } from "@redcircle/db";
+import * as schema from "@redcircle/db";
 import { eq, desc, and, gte, lte, like, or, sql } from "drizzle-orm";
 
-const { posts } = schema;
+const { posts, users } = schema;
 const router = Router();
 
 /**
@@ -83,14 +83,58 @@ router.post("/tokenize", async (req, res) => {
       tokenSupply, 
       initialPrice, 
       description,
-      userId // This should come from authenticated user session/JWT
+      userId // Optional for testing - will create/use test user if not provided
     } = req.body;
 
+    // Debug logging
+    console.log('📥 Tokenize request received:', { 
+      url: !!url, 
+      tokenSupply: !!tokenSupply, 
+      initialPrice: !!initialPrice, 
+      userId: !!userId,
+      hasDescription: !!description
+    });
+
     // Validation
-    if (!url || !tokenSupply || !initialPrice || !userId) {
+    if (!url || !tokenSupply || !initialPrice) {
+      const missing = [];
+      if (!url) missing.push('url');
+      if (!tokenSupply) missing.push('tokenSupply');
+      if (!initialPrice) missing.push('initialPrice');
+      
       return res.status(400).json({ 
-        error: "Missing required fields: url, tokenSupply, initialPrice, userId" 
+        error: `Missing required fields: ${missing.join(', ')}` 
       });
+    }
+
+    // For testing: create or get a test user if userId is not provided
+    let finalUserId = userId;
+    if (!finalUserId) {
+      console.log('⚠️  No userId provided, creating/using test user for localhost testing');
+      
+      // Try to find existing test user
+      const testUser = await db
+        .select()
+        .from(users)
+        .where(eq(users.redditId, 'test_user_localhost'))
+        .limit(1);
+
+      if (testUser.length > 0) {
+        finalUserId = testUser[0].id;
+        console.log(`✅ Using existing test user: ${finalUserId}`);
+      } else {
+        // Create test user
+        const [newTestUser] = await db
+          .insert(users)
+          .values({
+            redditId: 'test_user_localhost',
+            username: 'test_user',
+            isVerified: false,
+          })
+          .returning();
+        finalUserId = newTestUser.id;
+        console.log(`✅ Created test user: ${finalUserId}`);
+      }
     }
 
     if (tokenSupply < 1 || tokenSupply > 1000000000) {
@@ -192,7 +236,7 @@ router.post("/tokenize", async (req, res) => {
         totalVolume: "0",
         marketCap,
         holders: 1, // Authority wallet holds initial supply
-        creatorId: userId,
+        creatorId: finalUserId,
         creatorRewards: "0",
         tags: redditPost.subreddit ? [redditPost.subreddit] : [],
         featured: 0,

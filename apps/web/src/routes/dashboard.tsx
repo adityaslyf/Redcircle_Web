@@ -35,8 +35,10 @@ function DashboardPage() {
   }, [search.tab]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      // Redirect to sign-in if not authenticated
+    // Skip auth check for localhost testing
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost && !isLoading && !isAuthenticated) {
+      // Redirect to sign-in if not authenticated (only in production)
       navigate({ 
         to: "/signin",
         search: { redirect: "/dashboard" }

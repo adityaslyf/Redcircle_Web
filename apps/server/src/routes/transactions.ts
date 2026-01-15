@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticateToken } from "../middleware/auth";
-import { db } from "@Redcircle/db";
-import * as schema from "@Redcircle/db";
+import { db } from "@redcircle/db";
+import * as schema from "@redcircle/db";
 import { eq, desc, and, sql } from "drizzle-orm";
 
 const { transactions, posts } = schema;

@@ -82,7 +82,9 @@ export default function LaunchPanel() {
       return;
     }
 
-    if (!user?.id) {
+    // Skip user check for localhost testing
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost && !user?.id) {
       setError("You must be signed in to tokenize posts");
       return;
     }
@@ -104,7 +106,8 @@ export default function LaunchPanel() {
           tokenSupply: parseInt(initialSupply),
           initialPrice: parseFloat(initialPrice),
           description: description || null,
-          userId: user.id,
+          // userId is optional - backend will create test user if not provided
+          ...(user?.id && { userId: user.id }),
         }),
       });
 
